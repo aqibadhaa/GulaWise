@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -10,8 +10,14 @@ import {
   Moon,
   Activity as ActivityIcon,
   ChevronDown,
-  Share2
+  Share2,
+  Clock,
+  Utensils,
+  Frown,
+  Smile,
+  Zap
 } from 'lucide-react';
+import { PelacakAktifitas } from './components/PelacakAktifitas';
 import { LOGO_SRC } from './constants/assets';
 import type { User } from '@supabase/supabase-js';
 
@@ -26,13 +32,14 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction, handleLogout, onBackToHome }) => {
+  const [activeTab, setActiveTab] = useState('Dashboard');
   const userName = userProfile?.name || user.email?.split('@')[0] || 'User';
 
   const sidebarItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', active: true },
-    { icon: Activity, label: 'Pelacak Aktifitas', active: false },
-    { icon: Stethoscope, label: 'Konsultasi', active: false },
-    { icon: Trophy, label: 'Peringkat & Title', active: false },
+    { icon: LayoutDashboard, label: 'Dashboard' },
+    { icon: Activity, label: 'Pelacak Aktifitas' },
+    { icon: Stethoscope, label: 'Konsultasi' },
+    { icon: Trophy, label: 'Peringkat & Title' },
   ];
 
   const weeklyData = [
@@ -66,9 +73,10 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
             {sidebarItems.map((item) => (
               <button
                 key={item.label}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${item.active
-                    ? 'bg-[#689449] text-white shadow-lg shadow-[#689449]/20'
-                    : 'text-[#5c5c5c] hover:bg-[#f0f4ec]'
+                onClick={() => setActiveTab(item.label)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${activeTab === item.label
+                  ? 'bg-[#689449] text-white shadow-lg shadow-[#689449]/20'
+                  : 'text-[#5c5c5c] hover:bg-[#f0f4ec]'
                   }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -110,132 +118,143 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
         </header>
 
         <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Left Column: Stat Cards & Chart */}
+          {/* Left Column: Stat Cards & Chart / Other Views */}
           <div className="xl:col-span-2 space-y-6">
-            <h2 className="text-xl font-bold mb-4">Mei 2040</h2>
+            {activeTab === 'Dashboard' ? (
+              <>
+                <h2 className="text-xl font-bold mb-4">Mei 2040</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Sleep Card */}
-              <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-bold text-[#1c2b13]">Waktu Tidur</h3>
-                  <div className="p-2 bg-[#f0f4ec] rounded-lg">
-                    <Moon className="w-4 h-4 text-[#689449]" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-[#e4f0d5] text-[#4a7c3f] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <motion.span animate={{ rotate: -45 }} className="inline-block">↑</motion.span>
-                    Pola tidurmu makin baik dari bulan lalu
-                  </div>
-                </div>
-                <div className="flex items-baseline gap-2 mt-4">
-                  <span className="text-5xl font-bold tracking-tighter">122j</span>
-                  <span className="text-xs text-[#808080] leading-none mb-1">Total waktu tidur kamu<br />bulan ini</span>
-                </div>
-              </div>
-
-              {/* Physical Activity Card */}
-              <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-bold text-[#1c2b13]">Aktifitas Fisik</h3>
-                  <div className="p-2 bg-[#fcf2f2] rounded-lg">
-                    <ActivityIcon className="w-4 h-4 text-[#e05e5e]" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-[#fcf2f2] text-[#e05e5e] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <motion.span animate={{ rotate: 45 }} className="inline-block">↓</motion.span>
-                    Kamu kurang aktif dibandingkan bulan lalu
-                  </div>
-                </div>
-                <div className="flex items-baseline gap-2 mt-4">
-                  <span className="text-5xl font-bold tracking-tighter">43j</span>
-                  <span className="text-xs text-[#808080] leading-none mb-1">Total waktu beraktifitas<br />fisik bulan ini</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Weekly Recap Chart */}
-            <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
-                <div>
-                  <h3 className="font-bold text-lg">Aktivitas Mingguan Recap</h3>
-                  <p className="text-xs text-[#808080]">Pantau pola tidur dan aktivitasmu setiap hari</p>
-                </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#f8faf7] border border-[#e8e5d8] rounded-full text-xs font-bold">
-                  Minggu Pertama <ChevronDown className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-6 mb-8 text-[10px] font-bold uppercase tracking-wider">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#689449]" />
-                  <span>Tidur</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#9c5c5c]" />
-                  <span>Aktifitas Fisik</span>
-                </div>
-              </div>
-
-              <div className="relative h-64 w-full flex items-end justify-between gap-2 px-2">
-                {/* Horizontal grid lines */}
-                {[0, 2, 4, 6, 8].reverse().map((val) => (
-                  <div key={val} className="absolute left-0 right-0 border-t border-dashed border-[#e8e5d8]" style={{ bottom: `${(val / 8) * 100}%` }}>
-                    <span className="absolute -left-6 -top-2 text-[10px] font-bold text-[#a0a0a0]">{val}j</span>
-                  </div>
-                ))}
-
-                {weeklyData.map((d) => (
-                  <div key={d.day} className="flex-1 flex flex-col items-center group relative">
-                    <div className="flex items-end gap-1.5 w-full justify-center">
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${(d.sleep / 8) * 100}%` }}
-                        className="w-1/3 max-w-[20px] bg-[#689449] rounded-t-sm"
-                      />
-                      <motion.div
-                        initial={{ height: 0 }}
-                        animate={{ height: `${(d.activity / 8) * 100}%` }}
-                        className="w-1/3 max-w-[20px] bg-[#9c5c5c] rounded-t-sm"
-                      />
-                    </div>
-                    <span className="mt-4 text-[10px] font-bold text-[#808080]">{d.day}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Journey Section */}
-            <div className="service-journey pt-4">
-              <h3 className="font-bold text-lg mb-2">GulaWise Journey</h3>
-              <p className="text-xs text-[#808080] mb-6">Bagikan cerita hidup sehat kamu selama satu bulan terakhir</p>
-
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="min-w-[280px] h-[360px] bg-[#2d4a1e] rounded-[2rem] p-6 text-white relative flex flex-col justify-between overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
-                    <div className="relative z-10 flex flex-col h-full border border-white/20 rounded-[1.5rem] p-5 bg-black/10 backdrop-blur-sm">
-                      <p className="text-[10px] font-bold text-white/60 tracking-widest uppercase mb-4 text-center">GulaWise Wrapped</p>
-                      <h4 className="text-4xl font-bold text-center tracking-tighter mb-4">MEI 2040</h4>
-
-                      <div className="mt-auto space-y-4">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-white/10 rounded-lg"><Moon className="w-4 h-4" /></div>
-                          <div>
-                            <p className="text-xl font-bold">210jam</p>
-                            <p className="text-[10px] text-white/50">Total waktu beraktifitas fisik bulan ini</p>
-                          </div>
-                        </div>
-                        <div className="w-full h-[1px] bg-white/10" />
-                        <p className="text-[10px] text-center italic text-white/60">"Maju terus pantang menyerah, hidup ini apa ya?"</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Sleep Card */}
+                  <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-[#1c2b13]">Waktu Tidur</h3>
+                      <div className="p-2 bg-[#f0f4ec] rounded-lg">
+                        <Moon className="w-4 h-4 text-[#689449]" />
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="bg-[#e4f0d5] text-[#4a7c3f] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                        <motion.span animate={{ rotate: -45 }} className="inline-block">↑</motion.span>
+                        Pola tidurmu makin baik dari bulan lalu
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-4">
+                      <span className="text-5xl font-bold tracking-tighter">122j</span>
+                      <span className="text-xs text-[#808080] leading-none mb-1">Total waktu tidur kamu<br />bulan ini</span>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Physical Activity Card */}
+                  <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-[#1c2b13]">Aktifitas Fisik</h3>
+                      <div className="p-2 bg-[#fcf2f2] rounded-lg">
+                        <ActivityIcon className="w-4 h-4 text-[#e05e5e]" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="bg-[#fcf2f2] text-[#e05e5e] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                        <motion.span animate={{ rotate: 45 }} className="inline-block">↓</motion.span>
+                        Kamu kurang aktif dibandingkan bulan lalu
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-4">
+                      <span className="text-5xl font-bold tracking-tighter">43j</span>
+                      <span className="text-xs text-[#808080] leading-none mb-1">Total waktu beraktifitas<br />fisik bulan ini</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Weekly Recap Chart */}
+                <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+                    <div>
+                      <h3 className="font-bold text-lg">Aktivitas Mingguan Recap</h3>
+                      <p className="text-xs text-[#808080]">Pantau pola tidur dan aktivitasmu setiap hari</p>
+                    </div>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#f8faf7] border border-[#e8e5d8] rounded-full text-xs font-bold">
+                      Minggu Pertama <ChevronDown className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-6 mb-8 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#689449]" />
+                      <span>Tidur</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-[#9c5c5c]" />
+                      <span>Aktifitas Fisik</span>
+                    </div>
+                  </div>
+
+                  <div className="relative h-64 w-full flex items-end justify-between gap-2 px-2">
+                    {/* Horizontal grid lines */}
+                    {[0, 2, 4, 6, 8].reverse().map((val) => (
+                      <div key={val} className="absolute left-0 right-0 border-t border-dashed border-[#e8e5d8]" style={{ bottom: `${(val / 8) * 100}%` }}>
+                        <span className="absolute -left-6 -top-2 text-[10px] font-bold text-[#a0a0a0]">{val}j</span>
+                      </div>
+                    ))}
+
+                    {weeklyData.map((d) => (
+                      <div key={d.day} className="flex-1 flex flex-col items-center group relative">
+                        <div className="flex items-end gap-1.5 w-full justify-center">
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${(d.sleep / 8) * 100}%` }}
+                            className="w-1/3 max-w-[20px] bg-[#689449] rounded-t-sm"
+                          />
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${(d.activity / 8) * 100}%` }}
+                            className="w-1/3 max-w-[20px] bg-[#9c5c5c] rounded-t-sm"
+                          />
+                        </div>
+                        <span className="mt-4 text-[10px] font-bold text-[#808080]">{d.day}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Journey Section */}
+                <div className="service-journey pt-4">
+                  <h3 className="font-bold text-lg mb-2">GulaWise Journey</h3>
+                  <p className="text-xs text-[#808080] mb-6">Bagikan cerita hidup sehat kamu selama satu bulan terakhir</p>
+
+                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="min-w-[280px] h-[360px] bg-[#2d4a1e] rounded-[2rem] p-6 text-white relative flex flex-col justify-between overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                        <div className="relative z-10 flex flex-col h-full border border-white/20 rounded-[1.5rem] p-5 bg-black/10 backdrop-blur-sm">
+                          <p className="text-[10px] font-bold text-white/60 tracking-widest uppercase mb-4 text-center">GulaWise Wrapped</p>
+                          <h4 className="text-4xl font-bold text-center tracking-tighter mb-4">MEI 2040</h4>
+
+                          <div className="mt-auto space-y-4">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-white/10 rounded-lg"><Moon className="w-4 h-4" /></div>
+                              <div>
+                                <p className="text-xl font-bold">210jam</p>
+                                <p className="text-[10px] text-white/50">Total waktu beraktifitas fisik bulan ini</p>
+                              </div>
+                            </div>
+                            <div className="w-full h-[1px] bg-white/10" />
+                            <p className="text-[10px] text-center italic text-white/60">"Maju terus pantang menyerah, hidup ini apa ya?"</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : activeTab === 'Pelacak Aktifitas' ? (
+              <PelacakAktifitas onBackToHome={onBackToHome} />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full py-20 text-[#a0a0a0]">
+                <ActivityIcon className="w-16 h-16 mb-4 opacity-20" />
+                <p className="text-lg font-medium">Halaman {activeTab} sedang dalam pengembangan</p>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column: Risk & Ranking */}

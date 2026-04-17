@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { LogOut, UserCircle } from 'lucide-react';
-import { LOGO_SRC } from '../constants/assets';
+import LOGO_SRC from '../assets/LogoNew.webp';
 
 interface NavbarProps {
   user: User | null;
@@ -12,14 +12,14 @@ interface NavbarProps {
   currentPage: 'home' | 'login' | 'dashboard';
 }
 
-export const Navbar = ({ 
-  user, 
-  handleLogout, 
-  onLoginClick, 
-  onPredictClick, 
+export const Navbar = ({
+  user,
+  handleLogout,
+  onLoginClick,
+  onPredictClick,
   onDashboardClick,
   onHomeClick,
-  currentPage 
+  currentPage
 }: NavbarProps) => {
   return (
     <nav className="fixed top-0 w-full z-50 bg-[#fff]/90 backdrop-blur-md border-b border-[#e8e5d8] py-4 px-6 md:px-12 flex justify-between items-center">
@@ -28,7 +28,7 @@ export const Navbar = ({
         <img
           src={LOGO_SRC}
           alt="GulaWise"
-          className="h-7 w-auto"
+          className="h-8 w-auto"
           onError={(e) => { e.currentTarget.style.display = 'none'; }}
         />
         {/* Fallback text logo jika PNG belum ada */}
@@ -38,15 +38,15 @@ export const Navbar = ({
       </div>
 
       <div className="hidden md:flex gap-8 text-sm font-medium text-[#3d3d3d]">
-        <a 
-          href="#hero" 
+        <a
+          href="#hero"
           onClick={(e) => { e.preventDefault(); onHomeClick('hero'); }}
           className={`hover:text-[#4a7c3f] transition-colors ${currentPage === 'home' ? 'text-[#4a7c3f] font-bold' : ''}`}
         >
           Home
         </a>
-        <a 
-          href="#about" 
+        <a
+          href="#about"
           onClick={(e) => { e.preventDefault(); onHomeClick('about'); }}
           className="hover:text-[#4a7c3f] transition-colors"
         >

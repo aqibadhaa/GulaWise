@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mail, Lock, User, MapPin } from 'lucide-react';
 import { supabase } from './lib/supabase';
-import LogoHalamanLogin from './assets/logo.webp';
+import LogoHalamanLogin from './assets/LogoNew.webp';
 
 interface LoginProps {
   onBack: () => void;
@@ -144,7 +144,7 @@ export default function Login({ onBack, onLoginSuccess }: LoginProps) {
         )}
 
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-inner">
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center">
             <img src={LogoHalamanLogin} alt="Logo" className="w-12 h-12" />
           </div>
         </div>
