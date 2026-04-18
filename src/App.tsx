@@ -13,7 +13,7 @@ import { supabase } from './lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import type { PredictionResult } from './types';
 
-const API_URL = 'https://huggingface.co/spaces/tsaqibadha/GulaWise_Model';
+const API_URL = 'https://tsaqibadha-gulawise-model.hf.space';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
