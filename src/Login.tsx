@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Mail, Lock, User, MapPin } from 'lucide-react';
 import { supabase } from './lib/supabase';
-import LogoHalamanLogin from './assets/LogoNew.webp';
+import LogoHalamanLogin from './assets/BigLogo.webp';
 
 interface LoginProps {
   onBack: () => void;

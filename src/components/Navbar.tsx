@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { LogOut, UserCircle } from 'lucide-react';
-import LOGO_SRC from '../assets/LogoNew.webp';
+import LOGO_SRC from '../assets/BigLogo.webp';
 
 interface NavbarProps {
   user: User | null;
