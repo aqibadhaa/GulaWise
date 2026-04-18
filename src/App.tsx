@@ -13,7 +13,7 @@ import { supabase } from './lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import type { PredictionResult } from './types';
 
-const API_URL = 'http://localhost:8001';
+const API_URL = 'https://huggingface.co/spaces/tsaqibadha/GulaWise_Model';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
@@ -50,7 +50,7 @@ function App() {
       .select('name, kota')
       .eq('id', userId)
       .single();
-    
+
     if (!error && data) {
       setUserProfile(data);
     }
@@ -64,7 +64,7 @@ function App() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    
+
     if (!error && data) {
       updatePrediction(data);
     }
@@ -181,11 +181,11 @@ function App() {
             risk_color: result.risk_color,
             advice: result.advice
           });
-        
+
         if (saveError) {
           console.error('Error saving prediction history:', saveError);
         }
-        
+
         // Tetap set userPrediction agar dashboard terupdate di session ini
         // meskipun ada kendala di database (misal schema mismatch atau RLS)
         updatePrediction(result);
@@ -274,9 +274,9 @@ function App() {
       )}
 
       {currentPage === 'dashboard' && user && (
-        <Dashboard 
-          user={user} 
-          userProfile={userProfile} 
+        <Dashboard
+          user={user}
+          userProfile={userProfile}
           userPrediction={userPrediction}
           handleLogout={handleLogout}
           onBackToHome={() => setCurrentPage('home')}
