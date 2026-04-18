@@ -105,14 +105,58 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
 
       {/* Main Content */}
       <main className="flex-1 lg:ml-64 p-4 md:p-8">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <p className="text-xs text-[#a0a0a0] font-medium">Selamat datang kembali,</p>
-            <h1 className="text-2xl font-bold">{userName}</h1>
+        <header className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6 items-center">
+          <div className="xl:col-span-2 flex justify-between items-center">
+            <div>
+              <p className="text-xs text-[#a0a0a0] font-medium">Selamat datang kembali,</p>
+              <h1 className="text-2xl font-bold">{userName}</h1>
+            </div>
+
+            {/* Profile shifted towards center */}
+            <div className="hidden md:flex items-center gap-4 mr-12">
+              <div className="w-10 h-10 rounded-full bg-[#f0f4ec] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+                <img src="https://i.pravatar.cc/150?u=thealaa" alt="Profile" className="w-full h-full object-cover" />
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-[#f0f4ec] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-              <img src="https://i.pravatar.cc/150?u=thealaa" alt="Profile" className="w-full h-full object-cover" />
+
+          {/* Login Harian Container in the header space above Risk Card */}
+          <div className="xl:col-span-1">
+            <div className="bg-white p-4 rounded-[1.8rem] border border-[#e8e5d8] shadow-sm">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-bold text-[#1c2b13]">Login Harian</h3>
+              </div>
+              <div className="h-[1px] w-full bg-[#f0f0f0] mb-5" />
+              <div className="flex justify-between gap-2">
+                {[
+                  { day: 1, pts: 50, status: 'completed' },
+                  { day: 2, pts: 50, status: 'active' },
+                  { day: 3, pts: 300, status: 'upcoming' },
+                  { day: 4, pts: 50, status: 'upcoming' },
+                  { day: 5, pts: 50, status: 'upcoming' },
+                  { day: 6, pts: 300, status: 'upcoming' },
+                ].map((item) => (
+                  <div
+                    key={item.day}
+                    className={`flex-1 flex flex-col rounded-xl border overflow-hidden ${item.status === 'active' ? 'border-[#689449] ring-1 ring-[#689449]/20' : 'border-[#e8e5d8]'
+                      }`}
+                  >
+                    <div className={`py-1.5 text-center text-[8px] font-bold ${item.status === 'active' ? 'bg-[#689449] text-white' :
+                      item.status === 'completed' ? 'bg-[#f0f4ec] text-[#689449]' :
+                        'bg-[#f0f0f0] text-[#a0a0a0]'
+                      }`}>
+                      Hari {item.day}
+                    </div>
+                    <div className="flex-1 flex flex-col items-center justify-center py-2 px-1 bg-white">
+                      <span className={`text-[10px] font-bold ${item.status === 'upcoming' ? 'text-[#a0a0a0]' : 'text-[#1c2b13]'
+                        }`}>
+                        +{item.pts}
+                      </span>
+                      <span className="text-[7px] text-[#a0a0a0] font-medium">Poin</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </header>
@@ -248,7 +292,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
                 </div>
               </>
             ) : activeTab === 'Pelacak Aktifitas' ? (
-              <PelacakAktifitas onBackToHome={onBackToHome} />
+              <PelacakAktifitas onBackToHome={onBackToHome} user={user} />
             ) : (
               <div className="flex flex-col items-center justify-center h-full py-20 text-[#a0a0a0]">
                 <ActivityIcon className="w-16 h-16 mb-4 opacity-20" />
@@ -262,7 +306,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
             {/* Risk Card */}
             <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold">Tingkat Risiko Kamu</h3>
+                <h3 className="font-bold text-sm">Tingkat Risiko Kamu</h3>
                 {!userPrediction && (
                   <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4" onClick={onBackToHome}>
                     Cek Risiko Sekarang

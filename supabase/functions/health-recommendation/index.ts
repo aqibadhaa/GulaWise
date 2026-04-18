@@ -1,20 +1,45 @@
-// Tambahkan ini di paling atas untuk memperbaiki error tipe data di editor
-import "@supabase/functions-js/edge-runtime.d.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-Deno.serve(async (req) => {
-  // Handle CORS preflight request
+serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const body = await req.json();
+    console.log('body.messages:', JSON.stringify(body.messages));
+    // Mode chat: terima array messages langsung
+    if (body.messages) {
+      const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${Deno.env.get("GROQ_API_KEY")}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: body.messages,
+          max_tokens: 800,
+          temperature: 0.7,
+        }),
+      });
+
+      const groqData = await groqRes.json();
+      const recommendation = groqData.choices?.[0]?.message?.content ?? "Gagal mendapatkan respons.";
+
+      return new Response(JSON.stringify({ recommendation }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Mode awal: generate rekomendasi dari data tracker
     const {
+      nama,
       durasi_tidur,
       aktivitas_ringan,
       aktivitas_berat,
@@ -23,58 +48,55 @@ Deno.serve(async (req) => {
       gizi_serat,
       gizi_cairan,
       stress,
-      nama,
     } = body;
 
-    // Bangun context gizi
-    const giziList = [];
-    if (gizi_protein) giziList.push("protein");
-    if (gizi_karbo) giziList.push("karbohidrat");
-    if (gizi_serat) giziList.push("serat");
-    if (gizi_cairan) giziList.push("cairan/hidrasi");
+    const giziTerpenuhi: string[] = [];
+    const giziKurang: string[] = [];
 
-    const giziTerpenuhi = giziList.length > 0
-      ? `Gizi yang terpenuhi hari ini: ${giziList.join(", ")}.`
+    if (gizi_protein) giziTerpenuhi.push("protein"); else giziKurang.push("protein");
+    if (gizi_karbo) giziTerpenuhi.push("karbohidrat"); else giziKurang.push("karbohidrat");
+    if (gizi_serat) giziTerpenuhi.push("serat"); else giziKurang.push("serat");
+    if (gizi_cairan) giziTerpenuhi.push("cairan/hidrasi"); else giziKurang.push("cairan/hidrasi");
+
+    const giziContext = giziTerpenuhi.length > 0
+      ? `Gizi terpenuhi: ${giziTerpenuhi.join(", ")}. ${giziKurang.length > 0 ? `Gizi belum terpenuhi: ${giziKurang.join(", ")}.` : "Semua gizi terpenuhi!"}`
       : "Tidak ada gizi yang terpenuhi hari ini.";
 
-    const prompt = `
-Kamu adalah asisten kesehatan yang ramah dan peduli. Berikan rekomendasi kesehatan personal berdasarkan data aktivitas harian berikut untuk pengguna bernama ${nama ?? "pengguna"}.
+    const systemPrompt = `Kamu adalah asisten kesehatan GulaWise yang ramah, personal, dan peduli. Kamu membantu pengguna memahami kondisi kesehatan hariannya dan memberikan saran yang memotivasi. Gunakan bahasa Indonesia yang hangat dan tidak menghakimi. Jawab pertanyaan follow-up secara singkat dan relevan.`;
+
+    const userPrompt = `Berikan rekomendasi kesehatan personal berdasarkan data aktivitas harian berikut untuk pengguna bernama ${nama}.
 
 Data kesehatan hari ini:
 - Durasi tidur: ${durasi_tidur} jam
-- Aktivitas ringan: ${aktivitas_ringan} menit
-- Aktivitas berat: ${aktivitas_berat} menit
-- ${giziTerpenuhi}
+- Aktivitas ringan (jalan kaki, naik tangga, dll): ${aktivitas_ringan} menit
+- Aktivitas berat (badminton, futsal, gym, dll): ${aktivitas_berat} menit
+- ${giziContext}
 - Tingkat stres: ${stress}/10
 
 Pedoman kesehatan WHO:
 - Tidur ideal: 7-9 jam per malam
-- Aktivitas fisik: minimal 150 menit/minggu aktivitas sedang ATAU 75 menit/minggu aktivitas berat
+- Aktivitas fisik ringan: minimal 30 menit/hari
+- Aktivitas fisik berat: minimal 75 menit/minggu
 - Gizi seimbang: protein, karbohidrat, serat, dan cairan harus terpenuhi setiap hari
 - Stres: skor di atas 7 perlu perhatian khusus
 
-Berikan respons dalam format berikut:
-1. Sapa pengguna secara personal dan ringkas kondisi hari ini dalam 1-2 kalimat.
-2. Evaluasi singkat tiap aspek (tidur, aktivitas, gizi, stres).
-3. Saran konkret untuk besok (minimal 3 saran spesifik).
-
-Gunakan bahasa Indonesia yang hangat, personal, dan memotivasi. Jangan terlalu panjang.
-    `.trim();
-
-    const apiKey = Deno.env.get("GROQ_API_KEY");
-    if (!apiKey) {
-      throw new Error("GROQ_API_KEY is not set");
-    }
+Tulis respons dengan format:
+1. Sapa ${nama} dan ringkas kondisi hari ini dalam 1-2 kalimat menggunakan data spesifik
+2. Evaluasi singkat setiap aspek yang perlu diperhatikan
+3. Minimal 3 saran konkret dan spesifik untuk besok`;
 
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${Deno.env.get("GROQ_API_KEY")}`,
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
         max_tokens: 800,
         temperature: 0.7,
       }),
