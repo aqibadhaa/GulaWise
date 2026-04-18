@@ -5,17 +5,11 @@ import {
   Activity,
   Stethoscope,
   Trophy,
-  UserCircle,
   LogOut,
   Moon,
   Activity as ActivityIcon,
   ChevronDown,
   Share2,
-  Clock,
-  Utensils,
-  Frown,
-  Smile,
-  Zap
 } from 'lucide-react';
 import { PelacakAktifitas } from './components/PelacakAktifitas';
 import { LOGO_SRC } from './constants/assets';
@@ -292,7 +286,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
                 </div>
               </>
             ) : activeTab === 'Pelacak Aktifitas' ? (
-              <PelacakAktifitas onBackToHome={onBackToHome} user={user} />
+              <PelacakAktifitas user={user} />
             ) : (
               <div className="flex flex-col items-center justify-center h-full py-20 text-[#a0a0a0]">
                 <ActivityIcon className="w-16 h-16 mb-4 opacity-20" />

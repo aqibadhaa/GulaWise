@@ -16,7 +16,6 @@ import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 interface PelacakAktifitasProps {
-  onBackToHome: () => void;
   user: User;
 }
 
@@ -25,7 +24,7 @@ interface ChatMessage {
   content: string;
 }
 
-export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ onBackToHome, user }) => {
+export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ user }) => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
