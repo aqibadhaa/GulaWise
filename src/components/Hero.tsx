@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import { DASHBOARD_MOCKUP } from '../constants/assets';
+import DASHBOARD_MOCKUP from '../assets/Image - Hero.webp';
 
 interface HeroProps {
   onPredictClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
