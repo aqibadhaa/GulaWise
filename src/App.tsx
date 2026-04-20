@@ -21,6 +21,7 @@ function App() {
   const [userProfile, setUserProfile] = useState<{ name: string; kota: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [dashboardTab, setDashboardTab] = useState('Dashboard');
 
   const [formData, setFormData] = useState({
     age: '', gender: '', ethnicity: '', education: '', income: '',
@@ -189,6 +190,29 @@ function App() {
         // Tetap set userPrediction agar dashboard terupdate di session ini
         // meskipun ada kendala di database (misal schema mismatch atau RLS)
         updatePrediction(result);
+
+        const pointsAwarded = Math.max(0, 100 - Math.round(result.probability_percent));
+        
+        // Ambil poin lama
+        const { data: currentPoints } = await supabase
+          .from('user_points')
+          .select('total_points')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const newTotal = (currentPoints?.total_points || 0) + pointsAwarded;
+
+        const { error: upsertError } = await supabase
+          .from('user_points')
+          .upsert({
+            user_id: user.id,
+            total_points: newTotal,
+            last_updated: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (upsertError) {
+          console.error('Error updating points:', upsertError);
+        }
       }
 
       setTimeout(() => document.getElementById('result')?.scrollIntoView({ behavior: 'smooth' }), 100);
@@ -212,8 +236,32 @@ function App() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
+  const handleCekRisikoClick = () => {
+    document.getElementById('predict')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleTrackerClick = () => {
+    setDashboardTab('Pelacak Aktifitas');
+    if (user) {
+      setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('login');
+    }
+  };
+
   if (currentPage === 'login') {
-    return <Login onBack={() => setCurrentPage('home')} onLoginSuccess={() => setCurrentPage('home')} />;
+    return (
+      <Login
+        onBack={() => setCurrentPage('home')}
+        onLoginSuccess={() => {
+          if (dashboardTab === 'Pelacak Aktifitas') {
+            setCurrentPage('dashboard');
+          } else {
+            setCurrentPage('home');
+          }
+        }}
+      />
+    );
   }
 
   const inputCls = 'w-full bg-white border border-[#d4dcc8] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4a7c3f]/40 transition text-[#1c2b13]';
@@ -228,8 +276,10 @@ function App() {
         onDashboardClick={(e) => {
           e.preventDefault();
           if (user) {
+            setDashboardTab('Dashboard');
             setCurrentPage('dashboard');
           } else {
+            setDashboardTab('Dashboard');
             setCurrentPage('login');
           }
         }}
@@ -249,7 +299,11 @@ function App() {
       {currentPage === 'home' && (
         <>
           <Hero onPredictClick={handlePredictClick} fadeInUp={fadeInUp} />
-          <AboutUs fadeInUp={fadeInUp} />
+          <AboutUs
+            fadeInUp={fadeInUp}
+            onCekRisikoClick={handleCekRisikoClick}
+            onTrackerClick={handleTrackerClick}
+          />
           <Persuasive onPredictClick={handlePredictClick} fadeInUp={fadeInUp} />
           <PredictionForm
             user={user}
@@ -280,6 +334,7 @@ function App() {
           userPrediction={userPrediction}
           handleLogout={handleLogout}
           onBackToHome={() => setCurrentPage('home')}
+          initialTab={dashboardTab}
         />
       )}
 

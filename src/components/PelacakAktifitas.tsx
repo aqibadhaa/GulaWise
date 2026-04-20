@@ -17,6 +17,7 @@ import type { User } from '@supabase/supabase-js';
 
 interface PelacakAktifitasProps {
   user: User;
+  onPointsUpdate?: () => void;
 }
 
 interface ChatMessage {
@@ -24,7 +25,7 @@ interface ChatMessage {
   content: string;
 }
 
-export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ user }) => {
+export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ user, onPointsUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -54,11 +55,21 @@ export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ user }) => {
   const [todayData, setTodayData] = useState<any>(null);
 
   useEffect(() => {
+    const saved = sessionStorage.getItem(`chat_${user.id}`);
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    }
     fetchTodayActivity();
   }, [user.id]);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem(`chat_${user.id}`, JSON.stringify(messages));
+    }
   }, [messages]);
 
   const fetchTodayActivity = async () => {
@@ -90,9 +101,13 @@ export const PelacakAktifitas: React.FC<PelacakAktifitasProps> = ({ user }) => {
         });
 
         if (data.recommendation) {
-          setMessages([{ role: 'assistant', content: data.recommendation }]);
+          // Cek dulu apakah sudah ada chat di sessionStorage
+          const saved = sessionStorage.getItem(`chat_${user.id}`);
+          if (!saved) {
+            setMessages([{ role: 'assistant', content: data.recommendation }]);
+          }
 
-          // Tambah ini — ambil nama dulu sebelum build system prompt
+          // Ambil nama dulu sebelum build system prompt
           const { data: userData } = await supabase
             .from('users')
             .select('name')
@@ -273,6 +288,31 @@ Jawab pertanyaan follow-up secara singkat dan relevan dalam bahasa Indonesia yan
         setIsSubmitted(true);
         setTodayData(inserted);
         await fetchRecommendation(inserted);
+
+        // --- REWARD SYSTEM: Add 20 Points ---
+        const { data: currentPoints } = await supabase
+          .from('user_points')
+          .select('total_points')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const newTotal = (currentPoints?.total_points || 0) + 20;
+
+        const { error: upsertError } = await supabase
+          .from('user_points')
+          .upsert({
+            user_id: user.id,
+            total_points: newTotal,
+            last_updated: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (upsertError) {
+          console.error('Error updating points:', upsertError);
+          alert(`Gagal update poin: ${upsertError.message}`);
+        } else {
+          // Refresh points in parent (Dashboard)
+          if (onPointsUpdate) onPointsUpdate();
+        }
       }
     } catch (err) {
       console.error('Error saving activity:', err);

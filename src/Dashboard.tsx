@@ -11,6 +11,8 @@ import {
   ChevronDown,
   Share2,
 } from 'lucide-react';
+import { useEffect } from 'react';
+import { supabase } from './lib/supabase';
 import { PelacakAktifitas } from './components/PelacakAktifitas';
 import { LOGO_SRC } from './constants/assets';
 import type { User } from '@supabase/supabase-js';
@@ -23,10 +25,18 @@ interface DashboardProps {
   userPrediction: PredictionResult | null;
   handleLogout: () => Promise<void>;
   onBackToHome: () => void;
+  initialTab?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction, handleLogout, onBackToHome }) => {
-  const [activeTab, setActiveTab] = useState('Dashboard');
+const Dashboard: React.FC<DashboardProps> = ({
+  user,
+  userProfile,
+  userPrediction,
+  handleLogout,
+  onBackToHome,
+  initialTab = 'Dashboard'
+}) => {
+  const [activeTab, setActiveTab] = useState(initialTab);
   const userName = userProfile?.name || user.email?.split('@')[0] || 'User';
 
   const sidebarItems = [
@@ -35,6 +45,62 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
     { icon: Stethoscope, label: 'Konsultasi' },
     { icon: Trophy, label: 'Peringkat & Title' },
   ];
+
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [cityLeaderboard, setCityLeaderboard] = useState<any[]>([]);
+  const [userRank, setUserRank] = useState<number | string>('-');
+
+  useEffect(() => {
+    fetchLeaderboardData();
+  }, [user.id, userProfile?.kota]);
+
+  const fetchLeaderboardData = async () => {
+    try {
+      // 1. Ambil poin user sendiri
+      const { data: pointsData } = await supabase
+        .from('user_points')
+        .select('total_points')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const userPts = pointsData?.total_points || 0;
+      setTotalPoints(userPts);
+
+      // 2. Ambil leaderboard kota (Query dari tabel Users)
+      if (userProfile?.kota) {
+        const { data: lData } = await supabase
+          .from('users')
+          .select(`
+            name,
+            kota,
+            user_points (total_points)
+          `)
+          .eq('kota', userProfile.kota)
+          .not('user_points', 'is', null) // Hanya yang punya poin
+          .limit(10);
+
+        if (lData) {
+          // Sort manual di JS karena sort join table di Supabase sering error 400
+          const formatted = lData
+            .map((item: any) => ({
+              name: item.name,
+              points: item.user_points?.total_points || 0,
+              avatar: `https://i.pravatar.cc/150?u=${item.name}`
+            }))
+            .sort((a, b) => b.points - a.points)
+            .map((item, idx) => ({ ...item, rank: idx + 1 }));
+
+          setCityLeaderboard(formatted);
+
+          // 3. Hitung peringkat user
+          const myRank = formatted.findIndex(u => u.name === userProfile?.name);
+          setUserRank(myRank !== -1 ? myRank + 1 : '-');
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching leaderboard:', err);
+    }
+  };
 
   const weeklyData = [
     { day: 'Senin', sleep: 7.5, activity: 2 },
@@ -81,8 +147,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
             <div className="pt-8">
               <p className="text-[10px] font-bold text-[#a0a0a0] uppercase tracking-wider mb-4 px-3">Update Your Data</p>
               <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#5c5c5c] hover:bg-[#f0f4ec] transition-all">
-                <LayoutDashboard className="w-5 h-5" />
-                <span className="text-sm font-semibold">Title</span>
+                <Trophy className="w-5 h-5 text-[#689449]" />
+                <div className="flex flex-col items-start">
+                  <span className="text-[10px] font-bold text-[#a0a0a0]">Poin Kamu</span>
+                  <span className="text-sm font-bold text-[#1c2b13]">{totalPoints} Pts</span>
+                </div>
               </button>
             </div>
           </nav>
@@ -286,7 +355,66 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
                 </div>
               </>
             ) : activeTab === 'Pelacak Aktifitas' ? (
-              <PelacakAktifitas user={user} />
+              <PelacakAktifitas user={user} onPointsUpdate={fetchLeaderboardData} />
+            ) : activeTab === 'Peringkat & Title' ? (
+              <div className="space-y-8 animate-in fade-in duration-500">
+                <div className="bg-[#2d4a1e] p-8 rounded-[2.5rem] text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32" />
+                  <div className="relative z-10">
+                    <p className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Total Akumulasi Poin</p>
+                    <div className="flex items-baseline gap-4">
+                      <h2 className="text-6xl font-bold tracking-tighter">{totalPoints}</h2>
+                      <span className="text-2xl font-bold text-white/40">Pts</span>
+                    </div>
+                    <div className="mt-6 flex items-center gap-3 bg-white/10 w-fit px-4 py-2 rounded-full border border-white/10">
+                      <Trophy className="w-4 h-4 text-[#eab308]" />
+                      <span className="text-sm font-bold">Peringkat #{userRank || '-'} di {userProfile?.kota || 'Kota Kamu'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-[2.5rem] border border-[#e8e5d8] shadow-sm">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-xl font-bold">Leaderboard {userProfile?.kota || 'Kota Kamu'}</h3>
+                      <p className="text-xs text-[#808080]">Top 10 pejuang sehat di sekitarmu</p>
+                    </div>
+                    <div className="p-3 bg-[#f8faf7] rounded-2xl border border-[#e8e5d8]">
+                      <Trophy className="w-5 h-5 text-[#689449]" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {cityLeaderboard.map((u) => (
+                      <div
+                        key={u.rank}
+                        className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${u.name === userName ? 'bg-[#f0f4ec] border-[#689449] shadow-sm' : 'border-[#e8e5d8] hover:bg-[#f8faf7]'
+                          }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${u.rank === 1 ? 'bg-[#eab308] text-white' :
+                              u.rank === 2 ? 'bg-[#94a3b8] text-white' :
+                                u.rank === 3 ? 'bg-[#b45309] text-white' : 'bg-[#f0f4ec] text-[#689449]'
+                            }`}>
+                            {u.rank}
+                          </div>
+                          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div>
+                            <span className="block text-sm font-bold text-[#1c2b13]">{u.name}</span>
+                            {u.name === userName && <span className="text-[10px] font-bold text-[#689449] uppercase">Kamu</span>}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="block text-sm font-bold text-[#1c2b13]">{u.points}</span>
+                          <span className="text-[10px] font-bold text-[#808080] uppercase">Points</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full py-20 text-[#a0a0a0]">
                 <ActivityIcon className="w-16 h-16 mb-4 opacity-20" />
@@ -351,15 +479,17 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
             {/* Ranking Card */}
             <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm overflow-hidden relative">
               <div className="flex justify-between items-center mb-8">
-                <h3 className="font-bold">Peringkat Bulan Ini</h3>
+                <h3 className="font-bold">Peringkat di {userProfile?.kota || 'Kota Kamu'}</h3>
                 <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4">Lihat Lebih Detail</button>
               </div>
 
-              <p className="text-[10px] font-medium text-[#808080] mb-4 pl-1">Kamu saat ini berada di peringkat 23</p>
+              <p className="text-[10px] font-medium text-[#808080] mb-4 pl-1">
+                Kamu saat ini berada di peringkat {userRank || '-'}
+              </p>
 
               <div className="bg-[#f8faf7] border border-[#e8e5d8] rounded-2xl p-4 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#689449] text-white flex items-center justify-center text-xs font-bold">23</div>
+                  <div className="w-8 h-8 rounded-full bg-[#689449] text-white flex items-center justify-center text-xs font-bold">{userRank || '-'}</div>
                   <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
                     <img src="https://i.pravatar.cc/150?u=thealaa" alt="Me" className="w-full h-full object-cover" />
                   </div>
@@ -367,7 +497,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
                 </div>
                 <div className="bg-white px-2 py-1 rounded-full border border-[#e8e5d8] flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-[#689449]" />
-                  <span className="text-[10px] font-bold">1800 Points</span>
+                  <span className="text-[10px] font-bold">{totalPoints} Points</span>
                 </div>
               </div>
 
@@ -378,7 +508,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, userProfile, userPrediction
               <div className="h-[1px] w-full bg-[#e8e5d8] mb-6" />
 
               <div className="space-y-4">
-                {leaderboard.map((user) => (
+                {cityLeaderboard.slice(0, 3).map((user) => (
                   <div key={user.rank} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-xs font-bold text-[#808080] w-4">{user.rank}</span>

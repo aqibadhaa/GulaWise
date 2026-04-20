@@ -3,9 +3,11 @@ import { ShieldCheck, Stethoscope, Activity } from 'lucide-react';
 
 interface AboutUsProps {
   fadeInUp: any;
+  onCekRisikoClick: () => void;
+  onTrackerClick: () => void;
 }
 
-export const AboutUs = ({ fadeInUp }: AboutUsProps) => {
+export const AboutUs = ({ fadeInUp, onCekRisikoClick, onTrackerClick }: AboutUsProps) => {
   const cards = [
     {
       icon: <Stethoscope className="w-6 h-6" />,
@@ -79,7 +81,13 @@ export const AboutUs = ({ fadeInUp }: AboutUsProps) => {
 
               {/* Action */}
               <div className="mt-auto">
-                <button className="px-8 py-2.5 rounded-full border border-[#1c2b13]/40 text-[#1c2b13] font-semibold group-hover:border-white group-hover:text-white transition-all duration-500 hover:bg-white hover:text-[#689449]">
+                <button
+                  onClick={() => {
+                    if (i === 1) onCekRisikoClick();
+                    if (i === 2) onTrackerClick();
+                  }}
+                  className="px-8 py-2.5 rounded-full border border-[#1c2b13]/40 text-[#1c2b13] font-semibold group-hover:border-white group-hover:text-white transition-all duration-500 hover:bg-white hover:text-[#689449]"
+                >
                   Coba Sekarang
                 </button>
               </div>
