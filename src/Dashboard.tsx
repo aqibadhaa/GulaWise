@@ -112,11 +112,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     { day: 'Minggu', sleep: 8.2, activity: 2.2 },
   ];
 
-  const leaderboard = [
-    { rank: 1, name: 'Thealaab', points: 2100, avatar: 'https://i.pravatar.cc/150?u=1' },
-    { rank: 2, name: 'Thealaac', points: 1950, avatar: 'https://i.pravatar.cc/150?u=2' },
-    { rank: 3, name: 'Thealaad', points: 1800, avatar: 'https://i.pravatar.cc/150?u=3' },
-  ];
 
   return (
     <div className="flex min-h-screen bg-[#f8faf7] text-[#1c2b13] font-jakarta pt-20">
@@ -393,8 +388,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                       >
                         <div className="flex items-center gap-4">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${u.rank === 1 ? 'bg-[#eab308] text-white' :
-                              u.rank === 2 ? 'bg-[#94a3b8] text-white' :
-                                u.rank === 3 ? 'bg-[#b45309] text-white' : 'bg-[#f0f4ec] text-[#689449]'
+                            u.rank === 2 ? 'bg-[#94a3b8] text-white' :
+                              u.rank === 3 ? 'bg-[#b45309] text-white' : 'bg-[#f0f4ec] text-[#689449]'
                             }`}>
                             {u.rank}
                           </div>
