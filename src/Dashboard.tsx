@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard,
-  Activity,
-  Stethoscope,
-  Trophy,
-  LogOut,
   Moon,
   Activity as ActivityIcon,
   ChevronDown,
   Share2,
   Check,
+  Dumbbell,
+  Frown,
+  Utensils,
+  Trophy,
+  LogOut,
+  LayoutDashboard,
+  Activity,
+  Stethoscope,
+  Smile,
+  AlertCircle,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
@@ -52,7 +59,14 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [userRank, setUserRank] = useState<number | string>('-');
 
   const [dailyLogins, setDailyLogins] = useState<string[]>([]); // Array of dates 'YYYY-MM-DD'
-  const [monthlyStats, setMonthlyStats] = useState({ sleep: 0, light: 0, heavy: 0 });
+  const [monthlyStats, setMonthlyStats] = useState({ 
+    sleep: 0, 
+    light: 0, 
+    heavy: 0, 
+    stress: 0, 
+    nutrition: 0,
+    count: 0 
+  });
 
   useEffect(() => {
     fetchLeaderboardData();
@@ -68,7 +82,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       const { data, error } = await supabase
         .from('daily_activities')
-        .select('sleep_hours, light_activity_duration, heavy_activity_duration')
+        .select('sleep_hours, light_activity_duration, heavy_activity_duration, stress_level, has_protein, has_karbo, has_serat, has_cairan')
         .eq('user_id', user.id)
         .gte('date', firstDay)
         .lte('date', lastDay);
@@ -79,10 +93,25 @@ const Dashboard: React.FC<DashboardProps> = ({
         const totals = data.reduce((acc, curr) => ({
           sleep: acc.sleep + (curr.sleep_hours || 0),
           light: acc.light + (curr.light_activity_duration || 0),
-          heavy: acc.heavy + (curr.heavy_activity_duration || 0)
-        }), { sleep: 0, light: 0, heavy: 0 });
+          heavy: acc.heavy + (curr.heavy_activity_duration || 0),
+          stress: acc.stress + (curr.stress_level || 0),
+          nutrition: acc.nutrition + (
+            (curr.has_protein ? 1 : 0) +
+            (curr.has_karbo ? 1 : 0) +
+            (curr.has_serat ? 1 : 0) +
+            (curr.has_cairan ? 1 : 0)
+          )
+        }), { sleep: 0, light: 0, heavy: 0, stress: 0, nutrition: 0 });
 
-        setMonthlyStats(totals);
+        const count = data.length || 1;
+        setMonthlyStats({
+          sleep: totals.sleep,
+          light: totals.light,
+          heavy: totals.heavy,
+          stress: totals.stress / count,
+          nutrition: (totals.nutrition / (count * 4)) * 10,
+          count: data.length
+        });
       }
     } catch (err) {
       console.error('Error fetching monthly stats:', err);
@@ -329,53 +358,87 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </h2>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Sleep Card */}
-                    <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-bold text-[#1c2b13]">Waktu Tidur</h3>
-                        <div className="p-2 bg-[#f0f4ec] rounded-lg">
-                          <Moon className="w-4 h-4 text-[#689449]" />
-                        </div>
+                    {/* Waktu Tidur Card */}
+                    <div className="bg-white p-7 rounded-[2.5rem] border border-[#e8e5d8] shadow-sm flex flex-col gap-5">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-[#1c2b13]">Waktu Tidur</h3>
+                        <Moon className="w-6 h-6 text-[#1c2b13] fill-[#1c2b13]" />
                       </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-[#e4f0d5] text-[#4a7c3f] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                          <motion.span animate={{ rotate: -45 }} className="inline-block">↑</motion.span>
-                          Pola tidurmu terpantau bulan ini
-                        </div>
+                      <div className="h-[1px] w-full bg-[#f0f0f0]" />
+                      <div className="bg-[#f0f4ec] px-4 py-2 rounded-xl flex items-center gap-2 w-fit">
+                        <ThumbsUp className="w-4 h-4 text-[#689449]" />
+                        <span className="text-[11px] font-medium text-[#689449]">Pola tidurmu makin baik dari bulan lalu</span>
                       </div>
-                      <div className="flex items-baseline gap-2 mt-4">
-                        <span className="text-5xl font-bold tracking-tighter">{monthlyStats.sleep.toFixed(1)}j</span>
-                        <span className="text-xs text-[#808080] leading-none mb-1">Total waktu tidur kamu<br />bulan ini</span>
+                      <div className="bg-white p-6 rounded-[2rem] border border-[#f0f0f0] shadow-sm flex items-center justify-between">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-5xl font-bold tracking-tighter text-[#1c2b13]">{Math.round(monthlyStats.sleep)}j</span>
+                        </div>
+                        <p className="text-[11px] text-[#808080] font-medium leading-tight max-w-[100px]">
+                          Total waktu tidur kamu bulan ini
+                        </p>
                       </div>
                     </div>
 
-                    {/* Physical Activity Card */}
-                    <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm relative overflow-hidden group">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-bold text-[#1c2b13]">Aktifitas Fisik</h3>
-                        <div className="p-2 bg-[#fcf2f2] rounded-lg">
-                          <ActivityIcon className="w-4 h-4 text-[#e05e5e]" />
-                        </div>
+                    {/* Aktifitas Fisik Card */}
+                    <div className="bg-white p-7 rounded-[2.5rem] border border-[#e8e5d8] shadow-sm flex flex-col gap-5">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-[#1c2b13]">Aktifitas Fisik</h3>
+                        <Dumbbell className="w-6 h-6 text-[#1c2b13]" />
                       </div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="bg-[#fcf2f2] text-[#e05e5e] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                          <motion.span animate={{ rotate: 0 }} className="inline-block">🔥</motion.span>
-                          Tetap aktif untuk menjaga kesehatan
-                        </div>
+                      <div className="h-[1px] w-full bg-[#f0f0f0]" />
+                      <div className="bg-[#fcf2f2] px-4 py-2 rounded-xl flex items-center gap-2 w-fit">
+                        <ThumbsDown className="w-4 h-4 text-[#e05e5e]" />
+                        <span className="text-[11px] font-medium text-[#e05e5e]">Aktivitas fisikmu menurun dari bulan lalu</span>
                       </div>
-                      <div className="flex items-center gap-8 mt-4">
-                        <div className="flex flex-col">
-                          <span className="text-4xl font-bold tracking-tighter">{monthlyStats.light.toFixed(1)}j</span>
-                          <span className="text-[10px] text-[#808080] font-bold uppercase mt-1">Ringan</span>
+                      <div className="bg-white p-6 rounded-[2rem] border border-[#f0f0f0] shadow-sm flex items-center justify-between">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-5xl font-bold tracking-tighter text-[#1c2b13]">{Math.round(monthlyStats.light + monthlyStats.heavy)}m</span>
                         </div>
-                        <div className="w-[1px] h-10 bg-[#e8e5d8]" />
-                        <div className="flex flex-col">
-                          <span className="text-4xl font-bold tracking-tighter">{monthlyStats.heavy.toFixed(1)}j</span>
-                          <span className="text-[10px] text-[#808080] font-bold uppercase mt-1">Berat</span>
+                        <p className="text-[11px] text-[#808080] font-medium leading-tight max-w-[100px]">
+                          Total waktu aktifitas fisik kamu bulan ini
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Tingkat Stress Card */}
+                    <div className="bg-white p-7 rounded-[2.5rem] border border-[#e8e5d8] shadow-sm flex flex-col gap-5">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-[#1c2b13]">Tingkat Stress</h3>
+                        <Frown className="w-6 h-6 text-[#1c2b13]" />
+                      </div>
+                      <div className="h-[1px] w-full bg-[#f0f0f0]" />
+                      <div className="bg-[#f0f4f8] px-4 py-2 rounded-xl flex items-center gap-2 w-fit">
+                        <Smile className="w-4 h-4 text-[#407bb6]" />
+                        <span className="text-[11px] font-medium text-[#407bb6]">Tingkat stresmu tetap stabil dari bulan lalu</span>
+                      </div>
+                      <div className="bg-white p-6 rounded-[2rem] border border-[#f0f0f0] shadow-sm flex items-center justify-between">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-5xl font-bold tracking-tighter text-[#1c2b13]">{monthlyStats.stress.toFixed(1)}/10</span>
                         </div>
-                        <div className="ml-auto text-right">
-                          <span className="text-[9px] text-[#808080] font-medium leading-none block">Total waktu<br />aktifitas</span>
+                        <p className="text-[11px] text-[#808080] font-medium leading-tight max-w-[100px]">
+                          Rata-rata tingkat stres kamu bulan ini
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Gizi Makanan Card */}
+                    <div className="bg-white p-7 rounded-[2.5rem] border border-[#e8e5d8] shadow-sm flex flex-col gap-5">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-[#1c2b13]">Gizi Makanan</h3>
+                        <Utensils className="w-6 h-6 text-[#1c2b13]" />
+                      </div>
+                      <div className="h-[1px] w-full bg-[#f0f0f0]" />
+                      <div className="bg-[#fcf2f2] px-4 py-2 rounded-xl flex items-center gap-2 w-fit">
+                        <AlertCircle className="w-4 h-4 text-[#e05e5e]" />
+                        <span className="text-[11px] font-medium text-[#e05e5e]">Gizi kamu kurang seimbang dari bulan lalu</span>
+                      </div>
+                      <div className="bg-white p-6 rounded-[2rem] border border-[#f0f0f0] shadow-sm flex items-center justify-between">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-5xl font-bold tracking-tighter text-[#1c2b13]">{monthlyStats.nutrition.toFixed(1)}/10</span>
                         </div>
+                        <p className="text-[11px] text-[#808080] font-medium leading-tight max-w-[100px]">
+                          Keseimbangan asupan gizi harian kamu
+                        </p>
                       </div>
                     </div>
                   </div>
