@@ -10,6 +10,7 @@ import {
   Activity as ActivityIcon,
   ChevronDown,
   Share2,
+  Check,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
@@ -50,9 +51,139 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [cityLeaderboard, setCityLeaderboard] = useState<any[]>([]);
   const [userRank, setUserRank] = useState<number | string>('-');
 
+  const [dailyLogins, setDailyLogins] = useState<string[]>([]); // Array of dates 'YYYY-MM-DD'
+  const [monthlyStats, setMonthlyStats] = useState({ sleep: 0, light: 0, heavy: 0 });
+
   useEffect(() => {
     fetchLeaderboardData();
-  }, [user.id, userProfile?.kota]);
+    handleDailyLogin();
+    fetchMonthlyStats();
+  }, [user.id, userProfile?.kota, activeTab]);
+
+  const fetchMonthlyStats = async () => {
+    try {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toLocaleDateString('en-CA');
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toLocaleDateString('en-CA');
+
+      const { data, error } = await supabase
+        .from('daily_activities')
+        .select('sleep_hours, light_activity_duration, heavy_activity_duration')
+        .eq('user_id', user.id)
+        .gte('date', firstDay)
+        .lte('date', lastDay);
+
+      if (error) throw error;
+
+      if (data) {
+        const totals = data.reduce((acc, curr) => ({
+          sleep: acc.sleep + (curr.sleep_hours || 0),
+          light: acc.light + (curr.light_activity_duration || 0),
+          heavy: acc.heavy + (curr.heavy_activity_duration || 0)
+        }), { sleep: 0, light: 0, heavy: 0 });
+
+        setMonthlyStats(totals);
+      }
+    } catch (err) {
+      console.error('Error fetching monthly stats:', err);
+    }
+  };
+
+  const handleDailyLogin = async () => {
+    try {
+      const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+
+      // 1. Cek apakah sudah login hari ini
+      const { data: existing } = await supabase
+        .from('daily_logins')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('login_date', today)
+        .maybeSingle();
+
+      if (!existing) {
+        // 2. Jika belum, tambah record login harian
+        const { error: loginError } = await supabase
+          .from('daily_logins')
+          .insert({
+            user_id: user.id,
+            login_date: today,
+            points_awarded: 50
+          });
+
+        if (!loginError) {
+          // 3. Update total poin user (+50)
+          const { data: currentPoints } = await supabase
+            .from('user_points')
+            .select('total_points')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          const newTotal = (currentPoints?.total_points || 0) + 50;
+
+          await supabase
+            .from('user_points')
+            .upsert({
+              user_id: user.id,
+              total_points: newTotal,
+              last_updated: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          // Refresh data poin di UI
+          fetchLeaderboardData();
+        }
+      }
+
+      // 4. Ambil data login seminggu ini untuk UI
+      fetchWeeklyLogins();
+    } catch (err) {
+      console.error('Error in daily login system:', err);
+    }
+  };
+
+  const fetchWeeklyLogins = async () => {
+    // Ambil awal minggu ini (Senin)
+    const now = new Date();
+    const day = now.getDay(); // 0 (Minggu) - 6 (Sabtu)
+    const diff = now.getDate() - (day === 0 ? 6 : day - 1);
+    const monday = new Date(now);
+    monday.setDate(diff);
+    monday.setHours(0, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const { data } = await supabase
+      .from('daily_logins')
+      .select('login_date')
+      .eq('user_id', user.id)
+      .gte('login_date', monday.toLocaleDateString('en-CA'))
+      .lte('login_date', sunday.toLocaleDateString('en-CA'));
+
+    if (data) {
+      setDailyLogins(data.map(d => d.login_date));
+    }
+  };
+
+  const getDayStatus = (dayIndex: number) => {
+    // dayIndex 0 = Senin, ..., 6 = Minggu
+    const now = new Date();
+    const currentDay = now.getDay();
+    const adjustedCurrentDay = currentDay === 0 ? 6 : currentDay - 1; // 0=Senin, ..., 6=Minggu
+
+    // Hitung tanggal untuk dayIndex tersebut
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - (day === 0 ? 6 : day - 1) + dayIndex;
+    const targetDate = new Date(d.setDate(diff)).toLocaleDateString('en-CA');
+
+    if (dailyLogins.includes(targetDate)) return 'completed';
+    if (dayIndex === adjustedCurrentDay) return 'active';
+    return 'upcoming';
+  };
+
+  const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
   const fetchLeaderboardData = async () => {
     try {
@@ -186,34 +317,40 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div className="h-[1px] w-full bg-[#f0f0f0] mb-5" />
               <div className="flex justify-between gap-2">
-                {[
-                  { day: 1, pts: 50, status: 'completed' },
-                  { day: 2, pts: 50, status: 'active' },
-                  { day: 3, pts: 300, status: 'upcoming' },
-                  { day: 4, pts: 50, status: 'upcoming' },
-                  { day: 5, pts: 50, status: 'upcoming' },
-                  { day: 6, pts: 300, status: 'upcoming' },
-                ].map((item) => (
-                  <div
-                    key={item.day}
-                    className={`flex-1 flex flex-col rounded-xl border overflow-hidden ${item.status === 'active' ? 'border-[#689449] ring-1 ring-[#689449]/20' : 'border-[#e8e5d8]'
-                      }`}
-                  >
-                    <div className={`py-1.5 text-center text-[8px] font-bold ${item.status === 'active' ? 'bg-[#689449] text-white' :
-                      item.status === 'completed' ? 'bg-[#f0f4ec] text-[#689449]' :
-                        'bg-[#f0f0f0] text-[#a0a0a0]'
-                      }`}>
-                      Hari {item.day}
-                    </div>
-                    <div className="flex-1 flex flex-col items-center justify-center py-2 px-1 bg-white">
-                      <span className={`text-[10px] font-bold ${item.status === 'upcoming' ? 'text-[#a0a0a0]' : 'text-[#1c2b13]'
+                {dayNames.map((name, index) => {
+                  const status = getDayStatus(index);
+                  return (
+                    <div
+                      key={name}
+                      className={`flex-1 flex flex-col rounded-xl border overflow-hidden transition-all duration-500 ${status === 'active' ? 'border-[#689449] ring-2 ring-[#689449]/20 scale-105 z-10 shadow-md' : 'border-[#e8e5d8]'
+                        }`}
+                    >
+                      <div className={`py-1.5 text-center text-[7px] md:text-[8px] font-bold uppercase tracking-tighter ${status === 'active' ? 'bg-[#689449] text-white' :
+                        status === 'completed' ? 'bg-[#e4eed9] text-[#3d5c2a]' :
+                          'bg-[#f5f5f5] text-[#a0a0a0]'
                         }`}>
-                        +{item.pts}
-                      </span>
-                      <span className="text-[7px] text-[#a0a0a0] font-medium">Poin</span>
+                        {name}
+                      </div>
+                      <div className="flex-1 flex flex-col items-center justify-center py-2.5 px-1 bg-white relative">
+                        {status === 'completed' ? (
+                          <div className="absolute inset-0 bg-[#689449]/5 flex items-center justify-center">
+                            <div className="bg-[#689449] rounded-full p-0.5">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <span className={`text-[9px] md:text-[10px] font-black ${status === 'upcoming' ? 'text-[#d0d0d0]' : 'text-[#1c2b13]'
+                              }`}>
+                              +50
+                            </span>
+                            <span className="text-[6px] md:text-[7px] text-[#a0a0a0] font-bold uppercase">Poin</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -224,7 +361,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="xl:col-span-2 space-y-6">
             {activeTab === 'Dashboard' ? (
               <>
-                <h2 className="text-xl font-bold mb-4">Mei 2040</h2>
+                <h2 className="text-xl font-bold mb-4">
+                  {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+                </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Sleep Card */}
@@ -238,11 +377,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <div className="flex items-center gap-2 mb-2">
                       <div className="bg-[#e4f0d5] text-[#4a7c3f] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
                         <motion.span animate={{ rotate: -45 }} className="inline-block">↑</motion.span>
-                        Pola tidurmu makin baik dari bulan lalu
+                        Pola tidurmu terpantau bulan ini
                       </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-4">
-                      <span className="text-5xl font-bold tracking-tighter">122j</span>
+                      <span className="text-5xl font-bold tracking-tighter">{monthlyStats.sleep.toFixed(1)}j</span>
                       <span className="text-xs text-[#808080] leading-none mb-1">Total waktu tidur kamu<br />bulan ini</span>
                     </div>
                   </div>
@@ -257,13 +396,23 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="bg-[#fcf2f2] text-[#e05e5e] text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                        <motion.span animate={{ rotate: 45 }} className="inline-block">↓</motion.span>
-                        Kamu kurang aktif dibandingkan bulan lalu
+                        <motion.span animate={{ rotate: 0 }} className="inline-block">🔥</motion.span>
+                        Tetap aktif untuk menjaga kesehatan
                       </div>
                     </div>
-                    <div className="flex items-baseline gap-2 mt-4">
-                      <span className="text-5xl font-bold tracking-tighter">43j</span>
-                      <span className="text-xs text-[#808080] leading-none mb-1">Total waktu beraktifitas<br />fisik bulan ini</span>
+                    <div className="flex items-center gap-8 mt-4">
+                      <div className="flex flex-col">
+                        <span className="text-4xl font-bold tracking-tighter">{monthlyStats.light.toFixed(1)}j</span>
+                        <span className="text-[10px] text-[#808080] font-bold uppercase mt-1">Ringan</span>
+                      </div>
+                      <div className="w-[1px] h-10 bg-[#e8e5d8]" />
+                      <div className="flex flex-col">
+                        <span className="text-4xl font-bold tracking-tighter">{monthlyStats.heavy.toFixed(1)}j</span>
+                        <span className="text-[10px] text-[#808080] font-bold uppercase mt-1">Berat</span>
+                      </div>
+                      <div className="ml-auto text-right">
+                        <span className="text-[9px] text-[#808080] font-medium leading-none block">Total waktu<br />aktifitas</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -330,7 +479,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
                         <div className="relative z-10 flex flex-col h-full border border-white/20 rounded-[1.5rem] p-5 bg-black/10 backdrop-blur-sm">
                           <p className="text-[10px] font-bold text-white/60 tracking-widest uppercase mb-4 text-center">GulaWise Wrapped</p>
-                          <h4 className="text-4xl font-bold text-center tracking-tighter mb-4">MEI 2040</h4>
+                          <h4 className="text-4xl font-bold text-center tracking-tighter mb-4">
+                            {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toUpperCase()}
+                          </h4>
 
                           <div className="mt-auto space-y-4">
                             <div className="flex items-center gap-3">

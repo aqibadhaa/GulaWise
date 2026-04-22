@@ -77,214 +77,227 @@ export const PredictionForm = ({
             </button>
           </motion.div>
         ) : (
-          <form onSubmit={calculateRisk} className="space-y-12">
-
-            {/* ── 1. Personal Information ───────────────────────────────── */}
-            <motion.div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-[#e8e5d8]" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 border-b border-[#e8e5d8] pb-4 text-[#1c2b13]">
-                <div className="w-8 h-8 rounded-full bg-[#e4eed9] text-[#3d5c2a] flex items-center justify-center text-sm font-bold">1</div>
-                Informasi Pribadi
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Usia</label>
-                  <input type="number" name="age" min="1" max="120" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Jenis Kelamin</label>
-                  <select name="gender" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Jenis Kelamin</option>
-                    <option value="Female">Perempuan</option>
-                    <option value="Male">Laki-laki</option>
-                    <option value="Other">Lainnya</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Latar Belakang Etnis</label>
-                  <select name="ethnicity" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Etnis</option>
-                    <option value="Asian">Asia</option>
-                    <option value="Black">Black</option>
-                    <option value="Hispanic">Hispanic</option>
-                    <option value="White">White</option>
-                    <option value="Other">Lainnya</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Pendidikan Tertinggi</label>
-                  <select name="education" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Pendidikan</option>
-                    <option value="Bachelor">Sarjana (S1)</option>
-                    <option value="Highschool">SMA / Sederajat</option>
-                    <option value="No formal">Tidak Sekolah</option>
-                    <option value="Postgraduate">Pascasarjana</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Tingkat Penghasilan</label>
-                  <select name="income" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Penghasilan</option>
-                    <option value="High">Tinggi</option>
-                    <option value="Upper-Middle">Menengah Atas</option>
-                    <option value="Middle">Menengah</option>
-                    <option value="Lower-Middle">Menengah Bawah</option>
-                    <option value="Low">Rendah</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Status Pekerjaan</label>
-                  <select name="employment" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Status</option>
-                    <option value="Employed">Bekerja</option>
-                    <option value="Unemployed">Tidak Bekerja</option>
-                    <option value="Student">Pelajar / Mahasiswa</option>
-                    <option value="Retired">Pensiunan</option>
-                  </select>
+          <form onSubmit={calculateRisk} className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-[#e8e5d8] overflow-hidden">
+              {/* Header Utama Kontainer */}
+              <div className="p-10 md:p-12 border-b border-[#f3f3f1] bg-[#fafafa]/50">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-3xl font-extrabold text-[#1c2b13] tracking-tight">Mulai Cek Risiko Kamu</h3>
+                    <p className="text-[#8a9282] text-lg mt-1">Isi data di bawah untuk melihat estimasi risiko diabetesmu</p>
+                  </div>
+                  <div className="hidden md:flex w-14 h-14 rounded-2xl bg-[#e4eed9] items-center justify-center text-[#3d5c2a] shadow-inner">
+                    <Leaf className="w-8 h-8" />
+                  </div>
                 </div>
               </div>
-            </motion.div>
 
-            {/* ── 2. Health Measurements ────────────────────────────────── */}
-            <motion.div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-[#e8e5d8]" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 border-b border-[#e8e5d8] pb-4 text-[#1c2b13]">
-                <div className="w-8 h-8 rounded-full bg-[#e4eed9] text-[#3d5c2a] flex items-center justify-center text-sm font-bold">2</div>
-                Pengukuran Kesehatan
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Berat Badan (kg)</label>
-                  <input type="number" name="weight" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Tinggi Badan (cm)</label>
-                  <input type="number" name="height" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
-                </div>
-
-                {bmiPreview && (
-                  <div className="md:col-span-2">
-                    <div className="bg-[#e4eed9] border border-[#c9ddb8] rounded-xl px-4 py-3 text-sm text-[#3d5c2a] font-medium">
-                      📊 BMI terhitung: <strong>{bmiPreview}</strong>
-                      {parseFloat(bmiPreview) < 18.5 ? ' — Kekurangan Berat Badan' :
-                        parseFloat(bmiPreview) < 25 ? ' — Normal' :
-                          parseFloat(bmiPreview) < 30 ? ' — Kelebihan Berat Badan' : ' — Obesitas'}
+              <div className="p-10 md:p-12 space-y-14">
+                {/* ── 1. Personal Information ───────────────────────────────── */}
+                <section>
+                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                    <div className="w-2 h-6 bg-[#689449] rounded-full" />
+                    Informasi Pribadi
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Usia (tahun)</label>
+                      <input type="number" name="age" min="1" max="120" required className={inputCls} onChange={handleInputChange} placeholder="18 / Tahun" />
                     </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Jenis Kelamin</label>
+                      <select name="gender" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Female">Perempuan</option>
+                        <option value="Male">Laki-laki</option>
+                        <option value="Other">Lainnya</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Latar Belakang Etnis</label>
+                      <select name="ethnicity" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Etnis</option>
+                        <option value="Asian">Asia</option>
+                        <option value="Black">Black</option>
+                        <option value="Hispanic">Hispanic</option>
+                        <option value="White">White</option>
+                        <option value="Other">Lainnya</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Pendidikan Terakhir</label>
+                      <select name="education" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Pendidikan</option>
+                        <option value="Bachelor">Sarjana (S1)</option>
+                        <option value="Highschool">SMA / Sederajat</option>
+                        <option value="No formal">Tidak Sekolah</option>
+                        <option value="Postgraduate">Pascasarjana</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Perkiraan Pendapatan</label>
+                      <select name="income" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Penghasilan</option>
+                        <option value="High">Tinggi</option>
+                        <option value="Upper-Middle">Menengah Atas</option>
+                        <option value="Middle">Menengah</option>
+                        <option value="Lower-Middle">Menengah Bawah</option>
+                        <option value="Low">Rendah</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Status Pekerjaan</label>
+                      <select name="employment" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Status</option>
+                        <option value="Employed">Bekerja</option>
+                        <option value="Unemployed">Tidak Bekerja</option>
+                        <option value="Student">Pelajar / Mahasiswa</option>
+                        <option value="Retired">Pensiunan</option>
+                      </select>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── 2. Health Measurements ────────────────────────────────── */}
+                <section>
+                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                    <div className="w-2 h-6 bg-[#689449] rounded-full" />
+                    Data Kesehatan
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Berat Badan (kg)</label>
+                      <input type="number" name="weight" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Tinggi Badan (cm)</label>
+                      <input type="number" name="height" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+
+                    {bmiPreview && (
+                      <div className="md:col-span-2">
+                        <div className="bg-[#f0f9eb] border border-[#e1f0d7] rounded-2xl px-6 py-5 text-sm text-[#3d5c2a] flex items-center gap-4 shadow-sm">
+                          <span className="text-2xl">📊</span>
+                          <div>
+                            <p className="font-bold text-base">BMI Terhitung: {bmiPreview}</p>
+                            <p className="opacity-80">Kategori: {parseFloat(bmiPreview) < 18.5 ? 'Kekurangan Berat Badan' : parseFloat(bmiPreview) < 25 ? 'Normal' : parseFloat(bmiPreview) < 30 ? 'Kelebihan Berat Badan' : 'Obesitas'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Lingkar Pinggang (cm)</label>
+                      <input type="number" name="waist" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Lingkar Pinggul (cm)</label>
+                      <input type="number" name="hip" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Jam Tidur / Hari</label>
+                      <input type="number" name="sleep" step="0.5" min="0" max="24" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Screen Time / Hari (jam)</label>
+                      <input type="number" name="screenTime" step="0.5" min="0" max="24" className={inputCls} onChange={handleInputChange} />
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── 3. Lifestyle ─────────────────────────────────────────── */}
+                <section>
+                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                    <div className="w-2 h-6 bg-[#689449] rounded-full" />
+                    Gaya Hidup
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Minuman Alkohol / Minggu</label>
+                      <input type="number" name="alcohol" min="0" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Aktivitas Fisik (menit/minggu)</label>
+                      <input type="number" name="exercise" min="0" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Skor Kualitas Diet (1–10)</label>
+                      <input type="number" name="diet" min="1" max="10" step="0.1" required className={inputCls} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Status Merokok</label>
+                      <select name="smoking" required className={inputCls} onChange={handleInputChange}>
+                        <option value="">Pilih Status</option>
+                        <option value="Never">Tidak Pernah</option>
+                        <option value="Former">Mantan Perokok</option>
+                        <option value="Current">Perokok Aktif</option>
+                      </select>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ── 4. Medical History ────────────────────────────────────── */}
+                <section>
+                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                    <div className="w-2 h-6 bg-[#689449] rounded-full" />
+                    Riwayat Medis
+                  </h4>
+                  <div className="grid md:grid-cols-1 gap-6">
+                    {[
+                      { label: 'Apakah ada anggota keluarga yang menderita diabetes?', name: 'familyHistory' },
+                      { label: 'Pernahkah kamu didiagnosis tekanan darah tinggi?', name: 'bloodPressure' },
+                      { label: 'Apakah kamu memiliki riwayat penyakit kardiovaskular?', name: 'cardiovascular' },
+                    ].map(q => (
+                      <div key={q.name} className="flex flex-col md:flex-row md:items-center justify-between p-8 bg-[#fafafa]/50 rounded-[2rem] border border-[#f0f0f0] hover:bg-[#fafafa] transition-colors">
+                        <label className="text-base font-bold text-[#4e5a44] mb-5 md:mb-0 md:max-w-md leading-relaxed">{q.label}</label>
+                        <div className="flex gap-4">
+                          <label className="flex-1 md:flex-none flex items-center justify-center gap-2 cursor-pointer bg-white border border-[#e8e5d8] px-8 py-3 rounded-2xl hover:border-[#3d5c2a] transition-all has-[:checked]:bg-[#3d5c2a] has-[:checked]:text-white has-[:checked]:shadow-lg shadow-sm">
+                            <input type="radio" name={q.name} value="yes" required className="hidden" onChange={handleInputChange} />
+                            <span className="font-bold">Ya</span>
+                          </label>
+                          <label className="flex-1 md:flex-none flex items-center justify-center gap-2 cursor-pointer bg-white border border-[#e8e5d8] px-8 py-3 rounded-2xl hover:border-[#3d5c2a] transition-all has-[:checked]:bg-[#3d5c2a] has-[:checked]:text-white has-[:checked]:shadow-lg shadow-sm">
+                            <input type="radio" name={q.name} value="no" required className="hidden" onChange={handleInputChange} />
+                            <span className="font-bold">Tidak</span>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* ── Error Banner ─────────────────────────────────────────── */}
+                {apiError && (
+                  <div className="flex items-start gap-4 bg-red-50 border border-red-100 text-red-700 rounded-[2rem] px-8 py-5 animate-shake shadow-sm">
+                    <AlertCircle className="w-6 h-6 mt-0.5 shrink-0" />
+                    <p className="font-medium">{apiError}</p>
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Lingkar Pinggang (cm)</label>
-                  <input type="number" name="waist" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Lingkar Pinggul (cm)</label>
-                  <input type="number" name="hip" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
-                </div>
-
-                {whrPreview && (
-                  <div className="md:col-span-2">
-                    <div className="bg-[#e4eed9] border border-[#c9ddb8] rounded-xl px-4 py-3 text-sm text-[#3d5c2a] font-medium">
-                      📏 Rasio Pinggang-Pinggul: <strong>{whrPreview}</strong>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Rata-rata Jam Tidur / Hari</label>
-                  <input type="number" name="sleep" step="0.5" min="0" max="24" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Rata-rata Screen Time / Hari (jam)</label>
-                  <input type="number" name="screenTime" step="0.5" min="0" max="24" className={inputCls} onChange={handleInputChange} />
+                {/* ── Submit ───────────────────────────────────────────────── */}
+                <div className="pt-8">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-[#3d5c2a] hover:bg-[#2d4a1e] disabled:opacity-60 disabled:cursor-not-allowed text-white text-xl py-6 rounded-[2rem] font-black transition-all shadow-[0_20px_40px_rgba(61,92,42,0.2)] hover:shadow-[0_25px_50px_rgba(61,92,42,0.3)] hover:-translate-y-1.5 flex items-center justify-center gap-4 group"
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin w-7 h-7" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        Menganalisis Data...
+                      </>
+                    ) : (
+                      <>
+                        <span>Prediksi Risikonya</span>
+                        <Leaf className="w-7 h-7 group-hover:rotate-12 transition-transform" />
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-            </motion.div>
-
-            {/* ── 3. Lifestyle ─────────────────────────────────────────── */}
-            <motion.div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-[#e8e5d8]" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 border-b border-[#e8e5d8] pb-4 text-[#1c2b13]">
-                <div className="w-8 h-8 rounded-full bg-[#e4eed9] text-[#3d5c2a] flex items-center justify-center text-sm font-bold">3</div>
-                Gaya Hidup
-              </h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Minuman Alkohol per Minggu</label>
-                  <input type="number" name="alcohol" min="0" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Aktivitas Fisik (menit / minggu)</label>
-                  <input type="number" name="exercise" min="0" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Skor Kualitas Diet (1 – 10)</label>
-                  <input type="number" name="diet" min="1" max="10" step="0.1" required className={inputCls} onChange={handleInputChange} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#4e5a44] mb-2">Status Merokok</label>
-                  <select name="smoking" required className={inputCls} onChange={handleInputChange}>
-                    <option value="">Pilih Status</option>
-                    <option value="Never">Tidak Pernah</option>
-                    <option value="Former">Mantan Perokok</option>
-                    <option value="Current">Perokok Aktif</option>
-                  </select>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ── 4. Medical History ────────────────────────────────────── */}
-            <motion.div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-[#e8e5d8]" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3 border-b border-[#e8e5d8] pb-4 text-[#1c2b13]">
-                <div className="w-8 h-8 rounded-full bg-[#e4eed9] text-[#3d5c2a] flex items-center justify-center text-sm font-bold">4</div>
-                Riwayat Medis
-              </h3>
-              <div className="space-y-6">
-                {[
-                  { label: 'Apakah ada anggota keluarga yang menderita diabetes?', name: 'familyHistory' },
-                  { label: 'Pernahkah kamu didiagnosis tekanan darah tinggi?', name: 'bloodPressure' },
-                  { label: 'Apakah kamu memiliki riwayat penyakit kardiovaskular?', name: 'cardiovascular' },
-                ].map(q => (
-                  <div key={q.name}>
-                    <label className="block text-sm font-medium text-[#4e5a44] mb-2">{q.label}</label>
-                    <div className="flex gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name={q.name} value="yes" required className="w-4 h-4 accent-[#3d5c2a]" onChange={handleInputChange} />
-                        <span className="text-[#1c2b13]">Ya</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name={q.name} value="no" required className="w-4 h-4 accent-[#3d5c2a]" onChange={handleInputChange} />
-                        <span className="text-[#1c2b13]">Tidak</span>
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* ── Error Banner ─────────────────────────────────────────── */}
-            {apiError && (
-              <motion.div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-6 py-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
-                <p className="text-sm">{apiError}</p>
-              </motion.div>
-            )}
-
-            {/* ── Submit ───────────────────────────────────────────────── */}
-            <motion.div className="text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-[#3d5c2a] hover:bg-[#2d4a1e] disabled:opacity-60 disabled:cursor-not-allowed text-white text-xl px-12 py-4 rounded-full font-bold transition shadow-xl w-full md:w-auto flex items-center justify-center gap-3 mx-auto"
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                    </svg>
-                    Menganalisis...
-                  </>
-                ) : 'Prediksi Risikonya'}
-              </button>
-            </motion.div>
+            </div>
           </form>
         )}
       </div>
