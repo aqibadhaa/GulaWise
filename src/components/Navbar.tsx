@@ -22,20 +22,23 @@ export const Navbar = ({
   currentPage
 }: NavbarProps) => {
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#fff]/90 backdrop-blur-md border-b border-[#e8e5d8] py-4 px-6 md:px-12 flex justify-between items-center">
-      {/* Logo */}
-      <div className="flex items-center gap-2 md:ml-10">
-        <img
-          src={LOGO_SRC}
-          alt="GulaWise"
-          className="h-8 w-auto"
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-        />
-        {/* Fallback text logo jika PNG belum ada */}
-        <span className="text-xl font-bold text-[#1c2b13] tracking-tight cursor-pointer" onClick={() => onHomeClick()}>
-          GulaWise<span className="text-[#1A3C02]">.</span>
-        </span>
-      </div>
+    <nav className={`${currentPage === 'dashboard' ? 'relative' : 'fixed top-0'} w-full z-50 bg-[#fff]/90 backdrop-blur-md border-b border-[#e8e5d8] py-4 px-6 md:px-12 flex justify-between items-center`}>
+      {/* Logo - Hidden in Dashboard */}
+      {currentPage !== 'dashboard' ? (
+        <div className="flex items-center gap-2 md:ml-10">
+          <img
+            src={LOGO_SRC}
+            alt="GulaWise"
+            className="h-8 w-auto"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+          <span className="text-xl font-bold text-[#1c2b13] tracking-tight cursor-pointer" onClick={() => onHomeClick()}>
+            GulaWise<span className="text-[#1A3C02]">.</span>
+          </span>
+        </div>
+      ) : (
+        <div className="md:ml-10" /> // Spacer for dashboard
+      )}
 
       <div className="hidden md:flex gap-8 text-sm font-medium text-[#3d3d3d]">
         <a

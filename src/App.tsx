@@ -268,33 +268,35 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#fff] font-sans text-[#1c2b13] overflow-x-hidden">
-      <Navbar
-        user={user}
-        handleLogout={handleLogout}
-        onLoginClick={() => setCurrentPage('login')}
-        onPredictClick={handlePredictClick}
-        onDashboardClick={(e) => {
-          e.preventDefault();
-          if (user) {
-            setDashboardTab('Dashboard');
-            setCurrentPage('dashboard');
-          } else {
-            setDashboardTab('Dashboard');
-            setCurrentPage('login');
-          }
-        }}
-        onHomeClick={(sectionId) => {
-          setCurrentPage('home');
-          setTimeout(() => {
-            if (sectionId) {
-              document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      {currentPage !== 'dashboard' && (
+        <Navbar
+          user={user}
+          handleLogout={handleLogout}
+          onLoginClick={() => setCurrentPage('login')}
+          onPredictClick={handlePredictClick}
+          onDashboardClick={(e) => {
+            e.preventDefault();
+            if (user) {
+              setDashboardTab('Dashboard');
+              setCurrentPage('dashboard');
             } else {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setDashboardTab('Dashboard');
+              setCurrentPage('login');
             }
-          }, 100);
-        }}
-        currentPage={currentPage}
-      />
+          }}
+          onHomeClick={(sectionId) => {
+            setCurrentPage('home');
+            setTimeout(() => {
+              if (sectionId) {
+                document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }, 100);
+          }}
+          currentPage={currentPage}
+        />
+      )}
 
       {currentPage === 'home' && (
         <>

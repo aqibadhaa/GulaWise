@@ -334,7 +334,9 @@ Jawab pertanyaan follow-up secara singkat dan relevan dalam bahasa Indonesia yan
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-bold">Pelacak Aktifitas</h2>
+        <h2 className="text-xl font-bold">
+          {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </h2>
       </div>
 
       {/* Main Form Card */}
