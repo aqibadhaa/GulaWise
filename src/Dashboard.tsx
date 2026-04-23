@@ -61,13 +61,13 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [userRank, setUserRank] = useState<number | string>('-');
 
   const [dailyLogins, setDailyLogins] = useState<string[]>([]); // Array of dates 'YYYY-MM-DD'
-  const [monthlyStats, setMonthlyStats] = useState({ 
-    sleep: 0, 
-    light: 0, 
-    heavy: 0, 
-    stress: 0, 
+  const [monthlyStats, setMonthlyStats] = useState({
+    sleep: 0,
+    light: 0,
+    heavy: 0,
+    stress: 0,
     nutrition: 0,
-    count: 0 
+    count: 0
   });
 
   useEffect(() => {
@@ -590,11 +590,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
 
                   {/* Strava-style Achievement Share */}
-                  <AchievementShare 
-                    rank={userRank || 0} 
-                    points={totalPoints} 
-                    city={userProfile?.kota || 'Kota Kamu'} 
-                    userName={userName} 
+                  <AchievementShare
+                    rank={Number(userRank) || 0}
+                    points={totalPoints}
+                    city={userProfile?.kota || 'Kota Kamu'}
+                    userName={userName}
                   />
                 </div>
               ) : activeTab === 'Konsultasi' ? (
@@ -610,152 +610,152 @@ const Dashboard: React.FC<DashboardProps> = ({
             {/* Right Column: Risk & Ranking */}
             {activeTab !== 'Konsultasi' && (
               <div className="space-y-6">
-              {/* Login Harian Moved Here */}
-              <div className="bg-white p-4 rounded-[1.8rem] border border-[#e8e5d8] shadow-sm">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-sm font-bold text-[#1c2b13]">Login Harian</h3>
-                </div>
-                <div className="h-[1px] w-full bg-[#f0f0f0] mb-5" />
-                <div className="flex justify-between gap-2">
-                  {dayNames.map((name, index) => {
-                    const status = getDayStatus(index);
-                    return (
-                      <div
-                        key={name}
-                        className={`flex-1 flex flex-col rounded-xl border overflow-hidden transition-all duration-500 ${status === 'active' ? 'border-[#689449] ring-2 ring-[#689449]/20 scale-105 z-10 shadow-md' : 'border-[#e8e5d8]'
-                          }`}
-                      >
-                        <div className={`py-1.5 text-center text-[7px] md:text-[8px] font-bold uppercase tracking-tighter ${status === 'active' ? 'bg-[#689449] text-white' :
-                          status === 'completed' ? 'bg-[#e4eed9] text-[#3d5c2a]' :
-                            'bg-[#f5f5f5] text-[#a0a0a0]'
-                          }`}>
-                          {name}
-                        </div>
-                        <div className="flex-1 flex flex-col items-center justify-center py-2.5 px-1 bg-white relative">
-                          {status === 'completed' ? (
-                            <div className="absolute inset-0 bg-[#689449]/5 flex items-center justify-center">
-                              <div className="bg-[#689449] rounded-full p-0.5">
-                                <Check className="w-3 h-3 text-white" />
+                {/* Login Harian Moved Here */}
+                <div className="bg-white p-4 rounded-[1.8rem] border border-[#e8e5d8] shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-sm font-bold text-[#1c2b13]">Login Harian</h3>
+                  </div>
+                  <div className="h-[1px] w-full bg-[#f0f0f0] mb-5" />
+                  <div className="flex justify-between gap-2">
+                    {dayNames.map((name, index) => {
+                      const status = getDayStatus(index);
+                      return (
+                        <div
+                          key={name}
+                          className={`flex-1 flex flex-col rounded-xl border overflow-hidden transition-all duration-500 ${status === 'active' ? 'border-[#689449] ring-2 ring-[#689449]/20 scale-105 z-10 shadow-md' : 'border-[#e8e5d8]'
+                            }`}
+                        >
+                          <div className={`py-1.5 text-center text-[7px] md:text-[8px] font-bold uppercase tracking-tighter ${status === 'active' ? 'bg-[#689449] text-white' :
+                            status === 'completed' ? 'bg-[#e4eed9] text-[#3d5c2a]' :
+                              'bg-[#f5f5f5] text-[#a0a0a0]'
+                            }`}>
+                            {name}
+                          </div>
+                          <div className="flex-1 flex flex-col items-center justify-center py-2.5 px-1 bg-white relative">
+                            {status === 'completed' ? (
+                              <div className="absolute inset-0 bg-[#689449]/5 flex items-center justify-center">
+                                <div className="bg-[#689449] rounded-full p-0.5">
+                                  <Check className="w-3 h-3 text-white" />
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <>
-                              <span className={`text-[9px] md:text-[10px] font-black ${status === 'upcoming' ? 'text-[#d0d0d0]' : 'text-[#1c2b13]'
-                                }`}>
-                                +50
-                              </span>
-                              <span className="text-[6px] md:text-[7px] text-[#a0a0a0] font-bold uppercase">Poin</span>
-                            </>
-                          )}
+                            ) : (
+                              <>
+                                <span className={`text-[9px] md:text-[10px] font-black ${status === 'upcoming' ? 'text-[#d0d0d0]' : 'text-[#1c2b13]'
+                                  }`}>
+                                  +50
+                                </span>
+                                <span className="text-[6px] md:text-[7px] text-[#a0a0a0] font-bold uppercase">Poin</span>
+                              </>
+                            )}
+                          </div>
                         </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Risk Card */}
+                <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="font-bold text-sm">Tingkat Risiko Kamu</h3>
+                    {!userPrediction && (
+                      <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4" onClick={onBackToHome}>
+                        Cek Risiko Sekarang
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-center py-10 mb-8 border border-dashed border-[#e8e5d8] rounded-[1.5rem] bg-[#f8faf7]/50">
+                    {userPrediction ? (
+                      <div className="text-center">
+                        <span className="text-6xl font-bold tracking-tighter text-[#1c2b13]">
+                          {userPrediction.probability_percent}%
+                        </span>
+                        <p className="text-xs text-[#808080] font-medium mt-1">
+                          Risiko kamu diabetes ({userPrediction.risk_level})
+                        </p>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
+                    ) : (
+                      <div className="text-center px-4">
+                        <p className="text-sm text-[#808080] font-medium">Belum ada data prediksi</p>
+                        <button onClick={onBackToHome} className="text-xs font-bold text-[#689449] mt-2">Isi Form Sekarang →</button>
+                      </div>
+                    )}
+                  </div>
 
-              {/* Risk Card */}
-              <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-sm">Tingkat Risiko Kamu</h3>
-                  {!userPrediction && (
-                    <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4" onClick={onBackToHome}>
-                      Cek Risiko Sekarang
-                    </button>
-                  )}
+                  <div className="space-y-4">
+                    {[
+                      { color: 'bg-[#689449]', label: 'Risiko Rendah', keys: ['Low', 'Rendah', 'Normal'] },
+                      { color: 'bg-[#407bb6]', label: 'Perlu Perhatian', keys: ['Moderate', 'Sedang'] },
+                      { color: 'bg-[#9c5c5c]', label: 'Risiko Tinggi', keys: ['High', 'Tinggi'] },
+                    ].map((item) => {
+                      const isActive = userPrediction?.risk_level && item.keys.some(k =>
+                        userPrediction.risk_level.toLowerCase().includes(k.toLowerCase())
+                      );
+                      return (
+                        <div key={item.label} className={`flex items-center justify-between px-4 py-3 border rounded-xl transition-all ${isActive ? 'bg-[#f0f4ec] border-[#689449] translate-x-1' : 'border-[#e8e5d8]'}`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                            <span className={`text-xs font-bold ${isActive ? 'text-[#1c2b13]' : 'text-[#5c5c5c]'}`}>{item.label}</span>
+                          </div>
+                          {isActive && <div className="text-[10px] font-bold text-[#689449]">Status Kamu</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-center py-10 mb-8 border border-dashed border-[#e8e5d8] rounded-[1.5rem] bg-[#f8faf7]/50">
-                  {userPrediction ? (
-                    <div className="text-center">
-                      <span className="text-6xl font-bold tracking-tighter text-[#1c2b13]">
-                        {userPrediction.probability_percent}%
-                      </span>
-                      <p className="text-xs text-[#808080] font-medium mt-1">
-                        Risiko kamu diabetes ({userPrediction.risk_level})
-                      </p>
+                {/* Ranking Card */}
+                <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm overflow-hidden relative">
+                  <div className="flex justify-between items-center mb-8">
+                    <h3 className="font-bold">Peringkat di {userProfile?.kota || 'Kota Kamu'}</h3>
+                    <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4">Lihat Lebih Detail</button>
+                  </div>
+
+                  <p className="text-[10px] font-medium text-[#808080] mb-4 pl-1">
+                    Kamu saat ini berada di peringkat {userRank || '-'}
+                  </p>
+
+                  <div className="bg-[#f8faf7] border border-[#e8e5d8] rounded-2xl p-4 flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#689449] text-white flex items-center justify-center text-xs font-bold">{userRank || '-'}</div>
+                      <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                        <img src="https://i.pravatar.cc/150?u=thealaa" alt="Me" className="w-full h-full object-cover" />
+                      </div>
+                      <span className="text-xs font-bold">{userName}</span>
                     </div>
-                  ) : (
-                    <div className="text-center px-4">
-                      <p className="text-sm text-[#808080] font-medium">Belum ada data prediksi</p>
-                      <button onClick={onBackToHome} className="text-xs font-bold text-[#689449] mt-2">Isi Form Sekarang →</button>
+                    <div className="bg-white px-2 py-1 rounded-full border border-[#e8e5d8] flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-[#689449]" />
+                      <span className="text-[10px] font-bold">{totalPoints} Points</span>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="space-y-4">
-                  {[
-                    { color: 'bg-[#689449]', label: 'Risiko Rendah', keys: ['Low', 'Rendah', 'Normal'] },
-                    { color: 'bg-[#407bb6]', label: 'Perlu Perhatian', keys: ['Moderate', 'Sedang'] },
-                    { color: 'bg-[#9c5c5c]', label: 'Risiko Tinggi', keys: ['High', 'Tinggi'] },
-                  ].map((item) => {
-                    const isActive = userPrediction?.risk_level && item.keys.some(k =>
-                      userPrediction.risk_level.toLowerCase().includes(k.toLowerCase())
-                    );
-                    return (
-                      <div key={item.label} className={`flex items-center justify-between px-4 py-3 border rounded-xl transition-all ${isActive ? 'bg-[#f0f4ec] border-[#689449] translate-x-1' : 'border-[#e8e5d8]'}`}>
+                  <button className="w-full py-3.5 bg-[#689449] text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 mb-8 shadow-lg shadow-[#689449]/20 hover:bg-[#5a853e] transition-all">
+                    Bagikan Pencapaianmu <Share2 className="w-3.5 h-3.5" />
+                  </button>
+
+                  <div className="h-[1px] w-full bg-[#e8e5d8] mb-6" />
+
+                  <div className="space-y-4">
+                    {cityLeaderboard.slice(0, 3).map((user) => (
+                      <div key={user.rank} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                          <span className={`text-xs font-bold ${isActive ? 'text-[#1c2b13]' : 'text-[#5c5c5c]'}`}>{item.label}</span>
+                          <span className="text-xs font-bold text-[#808080] w-4">{user.rank}</span>
+                          <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                          </div>
+                          <span className="text-xs font-bold">{user.name}</span>
                         </div>
-                        {isActive && <div className="text-[10px] font-bold text-[#689449]">Status Kamu</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Ranking Card */}
-              <div className="bg-white p-6 rounded-[2rem] border border-[#e8e5d8] shadow-sm overflow-hidden relative">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="font-bold">Peringkat di {userProfile?.kota || 'Kota Kamu'}</h3>
-                  <button className="text-[10px] font-bold text-[#689449] underline decoration-[#689449]/30 underline-offset-4">Lihat Lebih Detail</button>
-                </div>
-
-                <p className="text-[10px] font-medium text-[#808080] mb-4 pl-1">
-                  Kamu saat ini berada di peringkat {userRank || '-'}
-                </p>
-
-                <div className="bg-[#f8faf7] border border-[#e8e5d8] rounded-2xl p-4 flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#689449] text-white flex items-center justify-center text-xs font-bold">{userRank || '-'}</div>
-                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                      <img src="https://i.pravatar.cc/150?u=thealaa" alt="Me" className="w-full h-full object-cover" />
-                    </div>
-                    <span className="text-xs font-bold">{userName}</span>
-                  </div>
-                  <div className="bg-white px-2 py-1 rounded-full border border-[#e8e5d8] flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-[#689449]" />
-                    <span className="text-[10px] font-bold">{totalPoints} Points</span>
-                  </div>
-                </div>
-
-                <button className="w-full py-3.5 bg-[#689449] text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 mb-8 shadow-lg shadow-[#689449]/20 hover:bg-[#5a853e] transition-all">
-                  Bagikan Pencapaianmu <Share2 className="w-3.5 h-3.5" />
-                </button>
-
-                <div className="h-[1px] w-full bg-[#e8e5d8] mb-6" />
-
-                <div className="space-y-4">
-                  {cityLeaderboard.slice(0, 3).map((user) => (
-                    <div key={user.rank} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-[#808080] w-4">{user.rank}</span>
-                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#689449]" />
+                          <span className="text-[10px] font-bold text-[#808080]">{user.points} Points</span>
                         </div>
-                        <span className="text-xs font-bold">{user.name}</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#689449]" />
-                        <span className="text-[10px] font-bold text-[#808080]">{user.points} Points</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                {/* Decorative gradient overlay at bottom if needed */}
-              </div>
+                  {/* Decorative gradient overlay at bottom if needed */}
+                </div>
               </div>
             )}
           </section>

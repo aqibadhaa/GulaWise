@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Camera, Download, X, Check } from 'lucide-react';
+import { Camera, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AchievementShareProps {
@@ -59,12 +59,12 @@ const AchievementShare: React.FC<AchievementShareProps> = ({ rank, points, city,
       // --- Draw Badge ---
       const isTop3 = rank <= 3;
       const badgeColor = rank === 1 ? '#eab308' : rank === 2 ? '#94a3b8' : rank === 3 ? '#b45309' : '#689449';
-      
+
       const badgeX = 60;
       const badgeY = canvasSize - 160;
       const badgeWidth = 420;
       const badgeHeight = 70;
-      
+
       // Draw rounded badge
       ctx.fillStyle = badgeColor;
       const r = 35;
@@ -93,7 +93,7 @@ const AchievementShare: React.FC<AchievementShareProps> = ({ rank, points, city,
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 84px Inter, sans-serif';
       ctx.fillText(`${points}`, canvasSize - 60, canvasSize - 100);
-      
+
       ctx.font = 'bold 24px Inter, sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.fillText('POINTS ACCUMULATED', canvasSize - 60, canvasSize - 60);
@@ -103,7 +103,7 @@ const AchievementShare: React.FC<AchievementShareProps> = ({ rank, points, city,
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 42px Inter, sans-serif';
       ctx.fillText('GulaWise.', 60, 100);
-      
+
       ctx.font = '24px Inter, sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.7)';
       ctx.fillText(userName, 60, canvasSize - 60);
@@ -154,7 +154,7 @@ const AchievementShare: React.FC<AchievementShareProps> = ({ rank, points, city,
             className="relative group rounded-[2rem] overflow-hidden shadow-2xl"
           >
             <img src={processedImage} alt="Preview" className="w-full h-auto" />
-            
+
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4">
               <button
                 onClick={downloadImage}
@@ -173,7 +173,7 @@ const AchievementShare: React.FC<AchievementShareProps> = ({ rank, points, city,
                 Ganti Foto
               </button>
             </div>
-            
+
             <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/30 text-xs text-white font-bold flex items-center gap-2">
               <div className="w-2 h-2 bg-[#689449] rounded-full animate-pulse" />
               SIAP DIBAGIKAN
