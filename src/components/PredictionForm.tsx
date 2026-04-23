@@ -34,9 +34,6 @@ export const PredictionForm = ({
   const bmiPreview = formData.weight && formData.height
     ? (parseFloat(formData.weight) / Math.pow(parseFloat(formData.height) / 100, 2)).toFixed(1)
     : null;
-  const whrPreview = formData.waist && formData.hip
-    ? (parseFloat(formData.waist) / parseFloat(formData.hip)).toFixed(3)
-    : null;
 
   return (
     <section id="predict" className="py-24 px-6 md:px-12 lg:px-24 bg-[#f9f8f3] relative">

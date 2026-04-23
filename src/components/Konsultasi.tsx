@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  MessageSquare, Star, Briefcase, Clock, ChevronDown,
-  ArrowLeft, Calendar, CreditCard, Wallet, QrCode,
-  Banknote, Send, User as UserIcon, ShieldCheck
+  Star, Briefcase, Clock, ArrowLeft, Send, User as UserIcon, ShieldCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
