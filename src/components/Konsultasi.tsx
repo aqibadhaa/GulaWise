@@ -340,7 +340,7 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
                         <img src={dr.image} alt={dr.name} className="w-14 h-14 rounded-2xl object-cover shadow-md" />
                         <div>
                           <p className="text-[10px] font-bold text-[#689449] uppercase tracking-wider">{dr.specialty}</p>
-                          <h4 className="text-sm font-bold text-[#1c2b13]">{dr.name}</h4>
+                          <h4 className="text-lg font-bold text-[#1c2b13]">{dr.name}</h4>
                         </div>
                       </div>
                       <div className="flex items-center gap-4 mb-8 relative z-10">

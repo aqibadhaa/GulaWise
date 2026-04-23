@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Moon,
   Activity as ActivityIcon,
@@ -18,6 +18,8 @@ import {
   AlertCircle,
   ThumbsUp,
   ThumbsDown,
+  Menu,
+  X
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
@@ -47,6 +49,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   initialTab = 'Dashboard'
 }) => {
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userName = userProfile?.name || user.email?.split('@')[0] || 'User';
 
   const sidebarItems = [
@@ -278,27 +281,117 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-[#f8faf7] text-[#1c2b13] font-jakarta">
       {/* New Sticky Header Bar - Spans across Sidebar and Main */}
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#e8e5d8] flex items-center">
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e8e5d8] flex items-center h-[72px]">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="lg:hidden ml-4 p-2 text-[#1c2b13] hover:bg-[#f0f4ec] rounded-xl transition-all"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+
         <div
           onClick={onBackToHome}
-          className="w-64 border-r border-[#e8e5d8] px-8 py-4 flex items-center gap-3 cursor-pointer hover:bg-[#f8faf7] transition-colors"
+          className="w-auto lg:w-64 lg:border-r border-[#e8e5d8] px-4 lg:px-8 py-4 flex items-center gap-2 lg:gap-3 cursor-pointer hover:bg-[#f8faf7] transition-colors h-full"
         >
           <img src={LOGO_SRC} alt="GulaWise" className="h-8 w-auto" />
-          <span className="text-xl font-bold text-[#1c2b13] tracking-tight">
+          <span className="text-xl font-bold text-[#1c2b13] tracking-tight hidden sm:inline">
             GulaWise<span className="text-[#1A3C02]">.</span>
           </span>
         </div>
 
-        <div className="flex-1 px-8 py-4 flex justify-between items-center">
+        <div className="flex-1 px-4 lg:px-8 py-4 flex justify-between items-center h-full">
           <div className="flex flex-col text-left">
-            <p className="text-[12px] font-dm-sans text-[#a0a0a0] tracking-wider">Selamat datang kembali,</p>
-            <p className="text-lg font-bold font-dm-sans text-[#1c2b13]">{userName}</p>
+            <p className="text-[12px] font-dm-sans text-[#a0a0a0] tracking-wider hidden md:block">Selamat datang kembali,</p>
+            <p className="text-sm lg:text-lg font-bold font-dm-sans text-[#1c2b13]">{userName}</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#f0f4ec] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-[#f0f4ec] flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
             <img src="https://i.pravatar.cc/150?u=thealaa" alt="Profile" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] lg:hidden"
+            />
+            
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[80%] max-w-[300px] bg-white z-[70] shadow-2xl lg:hidden flex flex-col"
+            >
+              <div className="p-6 flex items-center justify-between border-b border-[#e8e5d8]">
+                <div className="flex items-center gap-2">
+                  <img src={LOGO_SRC} alt="GulaWise" className="h-7 w-auto" />
+                  <span className="font-bold text-lg">GulaWise.</span>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 hover:bg-[#f0f4ec] rounded-xl transition-colors"
+                >
+                  <X className="w-5 h-5 text-[#a0a0a0]" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                <p className="text-[10px] font-bold text-[#a0a0a0] uppercase tracking-wider mb-4 px-3">Menu</p>
+                {sidebarItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      setActiveTab(item.label);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${activeTab === item.label
+                      ? 'bg-[#689449] text-white shadow-lg shadow-[#689449]/20'
+                      : 'text-[#5c5c5c] hover:bg-[#f0f4ec]'
+                      }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="text-sm font-semibold">{item.label}</span>
+                  </button>
+                ))}
+
+                <div className="pt-8 border-t border-[#f0f0f0] mt-4">
+                  <p className="text-[10px] font-bold text-[#a0a0a0] uppercase tracking-wider mb-4 px-3">Statistik Poin</p>
+                  <div className="px-3 py-3 rounded-xl bg-[#f8faf7] border border-[#e8e5d8] flex items-center gap-3">
+                    <Trophy className="w-5 h-5 text-[#689449]" />
+                    <div className="flex flex-col items-start">
+                      <span className="text-[10px] font-bold text-[#a0a0a0]">Poin Kamu</span>
+                      <span className="text-sm font-bold text-[#1c2b13]">{totalPoints} Pts</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-[#e8e5d8]">
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 border border-red-100 rounded-xl text-red-500 hover:bg-red-50 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-bold">Keluar Akun</span>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <div className="flex flex-1">
         {/* Sidebar */}
