@@ -18,7 +18,7 @@ const API_URL = 'https://tsaqibadha-gulawise-model.hf.space';
 function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<{ name: string; kota: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ name: string; kota: string; role?: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [dashboardTab, setDashboardTab] = useState('Dashboard');
@@ -48,7 +48,7 @@ function App() {
   const fetchUserProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('users')
-      .select('name, kota')
+      .select('name, kota, role')
       .eq('id', userId)
       .single();
 

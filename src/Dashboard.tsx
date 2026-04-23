@@ -22,6 +22,8 @@ import {
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { PelacakAktifitas } from './components/PelacakAktifitas';
+import { Konsultasi } from './components/Konsultasi';
+import AchievementShare from './components/AchievementShare';
 import LOGO_SRC from './assets/BigLogo.webp';
 import type { User } from '@supabase/supabase-js';
 
@@ -29,7 +31,7 @@ import type { PredictionResult } from './types';
 
 interface DashboardProps {
   user: User;
-  userProfile: { name: string; kota: string } | null;
+  userProfile: { name: string; kota: string; role?: string } | null;
   userPrediction: PredictionResult | null;
   handleLogout: () => Promise<void>;
   onBackToHome: () => void;
@@ -348,9 +350,9 @@ const Dashboard: React.FC<DashboardProps> = ({
 
 
 
-          <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <section className={`${activeTab === 'Konsultasi' ? 'block' : 'grid grid-cols-1 xl:grid-cols-3 gap-6'}`}>
             {/* Left Column: Stat Cards & Chart / Other Views */}
-            <div className="xl:col-span-2 space-y-6">
+            <div className={`${activeTab === 'Konsultasi' ? 'w-full' : 'xl:col-span-2 space-y-6'}`}>
               {activeTab === 'Dashboard' ? (
                 <>
                   <h2 className="text-xl font-bold mb-4">
@@ -586,7 +588,17 @@ const Dashboard: React.FC<DashboardProps> = ({
                       ))}
                     </div>
                   </div>
+
+                  {/* Strava-style Achievement Share */}
+                  <AchievementShare 
+                    rank={userRank || 0} 
+                    points={totalPoints} 
+                    city={userProfile?.kota || 'Kota Kamu'} 
+                    userName={userName} 
+                  />
                 </div>
+              ) : activeTab === 'Konsultasi' ? (
+                <Konsultasi user={user} userProfile={userProfile} />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full py-20 text-[#a0a0a0]">
                   <ActivityIcon className="w-16 h-16 mb-4 opacity-20" />
@@ -596,7 +608,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* Right Column: Risk & Ranking */}
-            <div className="space-y-6">
+            {activeTab !== 'Konsultasi' && (
+              <div className="space-y-6">
               {/* Login Harian Moved Here */}
               <div className="bg-white p-4 rounded-[1.8rem] border border-[#e8e5d8] shadow-sm">
                 <div className="flex justify-between items-center mb-2">
@@ -743,7 +756,8 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                 {/* Decorative gradient overlay at bottom if needed */}
               </div>
-            </div>
+              </div>
+            )}
           </section>
         </main>
       </div>
