@@ -21,6 +21,7 @@ interface Doctor {
   price: number;
   image: string;
   user_id: string;
+  is_available: boolean;
 }
 
 interface Consultation {
@@ -134,8 +135,30 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
           setCurrentConsultation(cons);
           setView('chat');
         } else {
-          const { data: docs } = await supabase.from('doctors').select('*');
-          setDoctors(docs || []);
+          // 1. Ambil ID semua dokter yang sedang melayani pasien (status active)
+          const { data: busyPackages } = await supabase
+            .from('consultation_packages')
+            .select('doctor_id')
+            .eq('status', 'active');
+
+          const busyDoctorIds = (busyPackages || []).map(p => p.doctor_id);
+
+          // 2. Ambil data semua dokter yang is_available = true
+          const { data: docs, error } = await supabase
+            .from('doctors')
+            .select('*')
+            .eq('is_available', true);
+
+          if (error) {
+            console.error('Error fetching doctors:', error);
+            setDoctors([]);
+            return;
+          }
+
+          // 3. Filter: Hanya tampilkan dokter yang is_available=true DAN tidak sedang sibuk
+          const availableDocs = (docs || []).filter(dr => !busyDoctorIds.includes(dr.id));
+
+          setDoctors(availableDocs);
         }
       }
     } catch (err) {
@@ -238,6 +261,13 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
             if (updateError) {
               console.error('Error updating status:', updateError);
             }
+
+            // Update status dokter jadi tidak tersedia
+            await supabase
+              .from('doctors')
+              .update({ is_available: false })
+              .eq('id', selectedDoctor.id);
+
             // Refresh data biar UI berubah jadi tampilan Chat
             fetchInitialData();
           },
