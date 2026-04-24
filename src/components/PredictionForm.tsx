@@ -80,7 +80,7 @@ export const PredictionForm = ({
               <div className="p-10 md:p-12 border-b border-[#f3f3f1] bg-[#fafafa]/50">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-3xl font-extrabold text-[#1c2b13] tracking-tight">Mulai Cek Risiko Kamu</h3>
+                    <h3 className="text-3xl font-jakarta font-bold text-[#1c2b13] tracking-tight">Mulai Cek Risiko Kamu</h3>
                     <p className="text-[#8a9282] text-lg mt-1">Isi data di bawah untuk melihat estimasi risiko diabetesmu</p>
                   </div>
                   <div className="hidden md:flex w-14 h-14 rounded-2xl bg-[#e4eed9] items-center justify-center text-[#3d5c2a] shadow-inner">
@@ -92,17 +92,17 @@ export const PredictionForm = ({
               <div className="p-10 md:p-12 space-y-14">
                 {/* ── 1. Personal Information ───────────────────────────────── */}
                 <section>
-                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                  <h4 className="text-[1.4rem] font-semibold font-dm-sans mb-8 text-[#1c2b13] flex items-center gap-3">
                     <div className="w-2 h-6 bg-[#689449] rounded-full" />
                     Informasi Pribadi
                   </h4>
                   <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Usia (tahun)</label>
-                      <input type="number" name="age" min="1" max="120" required className={inputCls} onChange={handleInputChange} placeholder="18 / Tahun" />
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Usia (tahun)</label>
+                      <input type="number" name="age" min="1" max="120" required className={inputCls} onChange={handleInputChange} placeholder="Tahun" />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Jenis Kelamin</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Jenis Kelamin</label>
                       <select name="gender" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Jenis Kelamin</option>
                         <option value="Female">Perempuan</option>
@@ -111,7 +111,7 @@ export const PredictionForm = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Latar Belakang Etnis</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Latar Belakang Etnis</label>
                       <select name="ethnicity" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Etnis</option>
                         <option value="Asian">Asia</option>
@@ -122,7 +122,7 @@ export const PredictionForm = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Pendidikan Terakhir</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Pendidikan Terakhir</label>
                       <select name="education" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Pendidikan</option>
                         <option value="Bachelor">Sarjana (S1)</option>
@@ -132,7 +132,7 @@ export const PredictionForm = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Perkiraan Pendapatan</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Perkiraan Pendapatan</label>
                       <select name="income" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Penghasilan</option>
                         <option value="High">Tinggi</option>
@@ -143,7 +143,7 @@ export const PredictionForm = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Status Pekerjaan</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Status Pekerjaan</label>
                       <select name="employment" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Status</option>
                         <option value="Employed">Bekerja</option>
@@ -157,17 +157,17 @@ export const PredictionForm = ({
 
                 {/* ── 2. Health Measurements ────────────────────────────────── */}
                 <section>
-                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                  <h4 className="text-[1.4rem] font-semibold font-dm-sans mb-8 text-[#1c2b13] flex items-center gap-3">
                     <div className="w-2 h-6 bg-[#689449] rounded-full" />
                     Data Kesehatan
                   </h4>
                   <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Berat Badan (kg)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Berat Badan (kg)</label>
                       <input type="number" name="weight" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Tinggi Badan (cm)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Tinggi Badan (cm)</label>
                       <input type="number" name="height" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
                     </div>
 
@@ -183,20 +183,16 @@ export const PredictionForm = ({
                       </div>
                     )}
 
-                    <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Lingkar Pinggang (cm)</label>
-                      <input type="number" name="waist" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
+                    <div className="md:col-span-2">
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Waist to Hip Ratio (Rasio Pinggang ke Pinggul)</label>
+                      <input type="number" name="whr" step="0.01" min="0" max="2" required className={inputCls} onChange={handleInputChange} placeholder="Misal: 0.85" />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Lingkar Pinggul (cm)</label>
-                      <input type="number" name="hip" step="0.1" min="1" required className={inputCls} onChange={handleInputChange} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Jam Tidur / Hari</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Jam Tidur / Hari</label>
                       <input type="number" name="sleep" step="0.5" min="0" max="24" required className={inputCls} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Screen Time / Hari (jam)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Screen Time / Hari (jam)</label>
                       <input type="number" name="screenTime" step="0.5" min="0" max="24" className={inputCls} onChange={handleInputChange} />
                     </div>
                   </div>
@@ -204,25 +200,25 @@ export const PredictionForm = ({
 
                 {/* ── 3. Lifestyle ─────────────────────────────────────────── */}
                 <section>
-                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                  <h4 className="text-[1.4rem] font-semibold font-dm-sans mb-8 text-[#1c2b13] flex items-center gap-3">
                     <div className="w-2 h-6 bg-[#689449] rounded-full" />
                     Gaya Hidup
                   </h4>
                   <div className="grid md:grid-cols-2 gap-x-10 gap-y-7">
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Minuman Alkohol / Minggu</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Minuman Alkohol / Minggu</label>
                       <input type="number" name="alcohol" min="0" required className={inputCls} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Aktivitas Fisik (menit/minggu)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Aktivitas Fisik (menit/minggu)</label>
                       <input type="number" name="exercise" min="0" required className={inputCls} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Skor Kualitas Diet (1–10)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Skor Kualitas Diet (1–10)</label>
                       <input type="number" name="diet" min="1" max="10" step="0.1" required className={inputCls} onChange={handleInputChange} />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-[#4e5a44] mb-2.5 ml-1">Status Merokok</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Status Merokok</label>
                       <select name="smoking" required className={inputCls} onChange={handleInputChange}>
                         <option value="">Pilih Status</option>
                         <option value="Never">Tidak Pernah</option>
@@ -235,7 +231,7 @@ export const PredictionForm = ({
 
                 {/* ── 4. Medical History ────────────────────────────────────── */}
                 <section>
-                  <h4 className="text-xl font-bold mb-8 text-[#1c2b13] flex items-center gap-3">
+                  <h4 className="text-[1.4rem] font-semibold font-dm-sans mb-8 text-[#1c2b13] flex items-center gap-3">
                     <div className="w-2 h-6 bg-[#689449] rounded-full" />
                     Riwayat Medis
                   </h4>

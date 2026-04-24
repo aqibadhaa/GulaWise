@@ -25,7 +25,7 @@ function App() {
 
   const [formData, setFormData] = useState({
     age: '', gender: '', ethnicity: '', education: '', income: '',
-    employment: '', weight: '', height: '', waist: '', hip: '',
+    employment: '', weight: '', height: '', whr: '',
     sleep: '', screenTime: '', alcohol: '', exercise: '', diet: '',
     smoking: '', familyHistory: '', bloodPressure: '', cardiovascular: '',
   });
@@ -109,11 +109,9 @@ function App() {
   const buildPayload = () => {
     const weight = parseFloat(formData.weight);
     const heightCm = parseFloat(formData.height);
-    const waist = parseFloat(formData.waist);
-    const hip = parseFloat(formData.hip);
     const heightM = heightCm / 100;
     const bmi = weight / (heightM * heightM);
-    const waistToHipRatio = waist / hip;
+    const waistToHipRatio = parseFloat(formData.whr);
     const g = formData.gender; const eth = formData.ethnicity;
     const edu = formData.education; const inc = formData.income;
     const emp = formData.employment; const smk = formData.smoking;

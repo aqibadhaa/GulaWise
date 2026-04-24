@@ -28,7 +28,7 @@ interface Consultation {
   id: string;
   user_id: string;
   doctor_id: string;
-  package_days: number;
+  package_duration: number; // Dalam menit
   price: number;
   payment_status: 'pending' | 'paid';
   status: 'active' | 'expired' | 'pending';
@@ -52,9 +52,9 @@ interface KonsultasiProps {
 }
 
 const packages = [
-  { id: '3days', label: '3 Hari', days: 3, price: 25000 },
-  { id: '5days', label: '5 Hari', days: 5, price: 40000 },
-  { id: '7days', label: '7 Hari', days: 7, price: 55000 },
+  { id: '15min', label: '15 Menit', minutes: 15, price: 25000 },
+  { id: '40min', label: '40 Menit', minutes: 40, price: 45000 },
+  { id: '60min', label: '60 Menit', minutes: 60, price: 60000 },
 ];
 
 export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => {
@@ -70,6 +70,15 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const isDoctor = userProfile?.role === 'doctor';
+
+  // Tick for timer
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (view === 'chat' && currentConsultation?.started_at) {
+      const interval = setInterval(() => setTick(t => t + 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [view, currentConsultation?.started_at]);
 
   useEffect(() => {
     fetchInitialData();
@@ -118,6 +127,7 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
             .eq('doctor_id', doctorProfile.id)
             .eq('payment_status', 'paid')
             .eq('status', 'active');
+          
           setActiveConsultations(cons || []);
         }
       } else {
@@ -135,15 +145,9 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
           setCurrentConsultation(cons);
           setView('chat');
         } else {
-          // 1. Ambil ID semua dokter yang sedang melayani pasien (status active)
-          const { data: busyPackages } = await supabase
-            .from('consultation_packages')
-            .select('doctor_id')
-            .eq('status', 'active');
-
-          const busyDoctorIds = (busyPackages || []).map(p => p.doctor_id);
-
-          // 2. Ambil data semua dokter yang is_available = true
+          // Ambil data semua dokter yang is_available = true
+          // Database Trigger (tr_lock_doctor) akan otomatis mengubah is_available jadi FALSE
+          // ketika ada booking sukses, jadi kita cukup percaya pada kolom ini saja.
           const { data: docs, error } = await supabase
             .from('doctors')
             .select('*')
@@ -155,10 +159,7 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
             return;
           }
 
-          // 3. Filter: Hanya tampilkan dokter yang is_available=true DAN tidak sedang sibuk
-          const availableDocs = (docs || []).filter(dr => !busyDoctorIds.includes(dr.id));
-
-          setDoctors(availableDocs);
+          setDoctors(docs || []);
         }
       }
     } catch (err) {
@@ -195,7 +196,7 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
         .insert({
           user_id: user.id,
           doctor_id: selectedDoctor.id,
-          package_days: selectedPackage.days,
+          package_duration: selectedPackage.minutes,
           price: selectedPackage.price,
           payment_status: 'pending',
           status: 'pending',
@@ -253,9 +254,8 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
               .from('consultation_packages')
               .update({
                 payment_status: 'paid',
-                status: 'active',
-                started_at: new Date().toISOString(),
-                expired_at: new Date(Date.now() + selectedPackage.days * 24 * 60 * 60 * 1000).toISOString()
+                status: 'active'
+                // started_at dan expired_at dikosongkan dulu sampai chat pertama
               })
               .eq('midtrans_order_id', orderId); // Pakai orderId yang kita buat tadi
             if (updateError) {
@@ -290,6 +290,29 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
 
     const msg = newMessage;
     setNewMessage('');
+
+    // Jika ini pesan pertama, aktifkan timer
+    if (!currentConsultation.started_at) {
+      const now = new Date();
+      const expiredAt = new Date(now.getTime() + currentConsultation.package_duration * 60000);
+      
+      const { error: updateError } = await supabase
+        .from('consultation_packages')
+        .update({
+          started_at: now.toISOString(),
+          expired_at: expiredAt.toISOString()
+        })
+        .eq('id', currentConsultation.id);
+
+      if (!updateError) {
+        // Update local state
+        setCurrentConsultation(prev => prev ? {
+          ...prev,
+          started_at: now.toISOString(),
+          expired_at: expiredAt.toISOString()
+        } : null);
+      }
+    }
 
     const { error } = await supabase
       .from('consultation_messages')
@@ -340,12 +363,13 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
                         </div>
                         <div>
                           <h4 className="font-bold text-[#1c2b13]">{cons.user_profile?.name || 'Pasien'}</h4>
-                          <p className="text-[10px] text-[#689449] font-bold uppercase">Paket {cons.package_days} Hari</p>
+                          <p className="text-[10px] text-[#689449] font-bold uppercase">Durasi {cons.package_duration} Menit</p>
                         </div>
                       </div>
                       <div className="mt-4 pt-4 border-t border-[#f0f0f0]">
-                        <p className="text-[10px] text-[#a0a0a0] uppercase font-bold">Berakhir pada:</p>
-                        <p className="text-xs font-bold">{new Date(cons.expired_at!).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                        <p className="text-[10px] text-[#a0a0a0] uppercase font-bold">
+                          {cons.started_at ? 'Sesi Dimulai' : 'Menunggu Chat Pertama'}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -488,10 +512,37 @@ export const Konsultasi: React.FC<KonsultasiProps> = ({ user, userProfile }) => 
                   </div>
                 </div>
               </div>
-              <div className="bg-[#f0f4ec] px-4 py-2 rounded-full border border-[#689449]/10">
-                <p className="text-[10px] font-bold text-[#689449] flex items-center gap-2">
-                  <ShieldCheck className="w-3 h-3" /> TERENKRIPSI END-TO-END
-                </p>
+              
+              <div className="flex items-center gap-4">
+                {/* Countdown Timer Widget */}
+                <div className={`px-4 py-2 rounded-2xl border flex items-center gap-2 transition-all ${
+                  !currentConsultation.started_at 
+                    ? 'bg-gray-50 border-gray-200 text-gray-400' 
+                    : 'bg-[#f0f4ec] border-[#689449]/20 text-[#689449]'
+                }`}>
+                  <Clock className="w-4 h-4" />
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-black uppercase tracking-tighter leading-none mb-0.5">Sisa Waktu</span>
+                    <span className="text-sm font-black font-mono leading-none">
+                      {(() => {
+                        if (!currentConsultation.started_at) return '--:--';
+                        const expiry = new Date(currentConsultation.expired_at!).getTime();
+                        const now = new Date().getTime();
+                        const diff = expiry - now;
+                        if (diff <= 0) return '00:00';
+                        const m = Math.floor(diff / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        return `${m}:${s < 10 ? '0' : ''}${s}`;
+                      })()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="hidden md:flex bg-[#f0f4ec] px-4 py-2 rounded-full border border-[#689449]/10">
+                  <p className="text-[10px] font-bold text-[#689449] flex items-center gap-2">
+                    <ShieldCheck className="w-3 h-3" /> TERENKRIPSI
+                  </p>
+                </div>
               </div>
             </div>
 
