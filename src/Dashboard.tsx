@@ -27,6 +27,7 @@ import { PelacakAktifitas } from './components/PelacakAktifitas';
 import { Konsultasi } from './components/Konsultasi';
 import AchievementShare from './components/AchievementShare';
 import LOGO_SRC from './assets/BigLogo.webp';
+import AdBanner from './components/AdBanner';
 import type { User } from '@supabase/supabase-js';
 
 import type { PredictionResult } from './types';
@@ -854,6 +855,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </section>
         </main>
       </div>
+      <AdBanner />
     </div>
   );
 };

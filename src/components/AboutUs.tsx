@@ -45,7 +45,7 @@ export const AboutUs = ({ fadeInUp, onCekRisikoClick, onTrackerClick }: AboutUsP
           Semua yang Kamu Butuhkan<br />untuk Kesehatanmu
         </h2>
         <p className="max-w-2xl mx-auto text-lg text-[#4e5a44] opacity-80 leading-relaxed font-jakarta">
-          Dengan GlucoCheck, kamu bisa cek risiko diabetes, memantau pola hidup, dan memahami kondisi kesehatanmu.
+          Dengan GulaWise, kamu bisa cek risiko diabetes, memantau pola hidup, dan memahami kondisi kesehatanmu.
         </p>
       </motion.div>
 
