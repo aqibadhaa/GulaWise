@@ -184,7 +184,7 @@ export const PredictionForm = ({
                     )}
 
                     <div className="md:col-span-2">
-                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Waist to Hip Ratio (Rasio Pinggang ke Pinggul)</label>
+                      <label className="block text-md font-bold font-dm-sans text-[#314521] mb-2.5 ml-1">Waist to Hip Ratio (Rasio Pinggang ke Pinggul) <br /><a className='ml-[0.1%] italic text-[#689449] text-sm' href="https://healthbyscience.co.uk/wp-content/uploads/2023/03/WHAT-YOUR-WAIST-TO-HIP-RATIO-MEAN.png">Panduan Visualisasi WHR</a></label>
                       <input type="number" name="whr" step="0.01" min="0" max="2" required className={inputCls} onChange={handleInputChange} placeholder="Misal: 0.85" />
                     </div>
                     <div>
@@ -242,7 +242,7 @@ export const PredictionForm = ({
                       { label: 'Apakah kamu memiliki riwayat penyakit kardiovaskular?', name: 'cardiovascular' },
                     ].map(q => (
                       <div key={q.name} className="flex flex-col md:flex-row md:items-center justify-between p-8 bg-[#fafafa]/50 rounded-[2rem] border border-[#f0f0f0] hover:bg-[#fafafa] transition-colors">
-                        <label className="text-base font-bold text-[#4e5a44] mb-5 md:mb-0 md:max-w-md leading-relaxed">{q.label}</label>
+                        <label className="text-lg font-bold font-dm-sans text-[#4e5a44] mb-5 md:mb-0 md:max-w-md leading-relaxed">{q.label}</label>
                         <div className="flex gap-4">
                           <label className="flex-1 md:flex-none flex items-center justify-center gap-2 cursor-pointer bg-white border border-[#e8e5d8] px-8 py-3 rounded-2xl hover:border-[#3d5c2a] transition-all has-[:checked]:bg-[#3d5c2a] has-[:checked]:text-white has-[:checked]:shadow-lg shadow-sm">
                             <input type="radio" name={q.name} value="yes" required className="hidden" onChange={handleInputChange} />

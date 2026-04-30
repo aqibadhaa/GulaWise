@@ -22,9 +22,9 @@ export const Hero = ({ onPredictClick, fadeInUp }: HeroProps) => {
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-3 md:px-12 w-full flex flex-col md:flex-row items-center gap-20 -py-10">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 md:px-12 w-full flex flex-col md:flex-row items-center gap-16 -py-10">
         {/* Left: Text */}
-        <motion.div className="flex-1 flex flex-col gap-6 md:-ml-10 xl:-ml-2 2xl:-ml-20 max-w-2xl font-satoshi" initial="hidden" animate="visible" variants={fadeInUp}>
+        <motion.div className="flex-1 flex flex-col gap-6 md:-ml-10 xl:-ml-1 2xl:-ml-18 max-w-2xl font-satoshi" initial="hidden" animate="visible" variants={fadeInUp}>
           <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight text-[#1c2b13] font-jakarta">
             Kenali Risiko Diabetes<br />&amp; Mulai Perubahan
           </motion.h1>
